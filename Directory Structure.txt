@@ -1,0 +1,37 @@
+chess_game/
+│
+├── pieces/
+│   ├── __init__.py
+│   ├── piece.py
+│   ├── pawn.py
+│   ├── rook.py
+│   ├── knight.py
+│   ├── bishop.py
+│   ├── queen.py
+│   └── king.py
+│
+├── board/
+│   ├── __init__.py
+│   └── board.py
+│
+├── player/
+│   ├── __init__.py
+│   └── player.py
+│
+├── game/
+│   ├── __init__.py
+│   └── game.py
+│
+├── gui/
+│   ├── __init__.py
+│   ├── gui.py
+│   └── assets/
+│
+├── utils/
+│   ├── __init__.py
+│   └── utils.py
+│
+├── constants/
+│   └── __init__.py
+│
+└── main.py
