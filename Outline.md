@@ -1,0 +1,40 @@
+# Chess Outline
+
+## Scope and Objectives
+  - **Scope:**
+    - Develope a playable chess game that opens in web browser.
+    - This game will not have bot functionality.
+
+## Requirments
+  - **Functional Requirments:**
+    - Display pieces
+    - Move pieces
+    - Capture Pieces
+    - Check detection
+    - Checkmate detection
+    - Pinned piece detection
+    - Pawn promotion
+  - **Non-Functional Requirments:**
+    - Piece move annimation
+    - Sound
+    - Display piece possible moves
+    - View previous moves
+   
+## Project Plan
+  - **Tasks:**
+  1. Set up development environemnt
+  2. Implement board size and square colors
+  3. Add pieces to the board
+  4. Implement piece movement
+  5. Handle piece capture
+  6. Handle check/checkmate
+  7. Handle pinned peices
+  8. Implement pawn promotion
+   
+## Technologies and Tools:
+  - **Language:**
+    - Python
+    - JavaScript
+  - **Libraries:**
+    - Pygame (Python)
+    - Phaser (JavaScript
