@@ -1,4 +1,4 @@
-from GUI import GUI
+import GUI
 
 WIDTH, HEIGHT = 800, 800
 
