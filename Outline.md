@@ -39,3 +39,21 @@
   - **Libraries:**
     - Pygame (Python)
     ~- Phaser (JavaScript~
+
+# Classes, Methods and Attributes Outline
+
+- Class Board
+- Class Piece
+  - **Attributes:**
+    - Color
+    - Location
+- Class Player
+  - **Attributes:**
+    - Color
+- Class Square
+  - **Attributes:**
+    - Color
+    - Location
+- Class Game
+- Class GUI
+- Class Move
