@@ -2,8 +2,9 @@
 
 ## Scope and Objectives
   - **Scope:**
-    - Develope a playable chess game that opens in web browser.
+    - Develope a playable chess game that opens in ~web browser~ PyGame.
     - This game will not have bot functionality.
+    - This will be of modular design as a learning oppurtinity.
 
 ## Requirments
   - **Functional Requirments:**
@@ -21,7 +22,7 @@
     - View previous moves
    
 ## Project Plan
-  - **Tasks:**
+  ### **Tasks:**
   1. Set up development environemnt
   2. Implement board size and square colors
   3. Add pieces to the board
@@ -34,7 +35,7 @@
 ## Technologies and Tools:
   - **Language:**
     - Python
-    - JavaScript
+    ~- JavaScript~
   - **Libraries:**
     - Pygame (Python)
-    - Phaser (JavaScript
+    ~- Phaser (JavaScript~
