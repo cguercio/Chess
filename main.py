@@ -1,9 +1,9 @@
-from gui import Screen
+import GUI
 
 WIDTH, HEIGHT = 800, 800
 
 def main():
-    screen = Screen(WIDTH, HEIGHT)
+    screen = GUI.Screen(WIDTH, HEIGHT)
     screen.display()
 
 if __name__ == '__main__':
