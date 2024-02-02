@@ -1,14 +1,16 @@
 from graphics import gui
+import pygame
 
-WIDTH, HEIGHT = 800, 800
 
 def main():
+    clock = pygame.time.Clock()
     running = True
 
-    while running:
+    screen = gui.Screen(WIDTH, HEIGHT)
+    screen.draw_squares()
 
-        screen = gui.Screen(WIDTH, HEIGHT)
-        screen.display()
+    while running:
+        clock.tick(FPS)
 
         for event in gui.pygame.event.get():
             if event.type == gui.pygame.QUIT:
