@@ -1,4 +1,5 @@
 from constants import *
+from utils import *
 
 class Board:
 
@@ -17,4 +18,10 @@ class Board:
     
     def place_piece(self, piece):
         self.board[piece.x][piece.y] = piece
+        # print(self.board)
+
+    def update_piece(self, piece, x, y):
+        self.board[x][y] = []
+        self.board[piece.x][piece.y] = piece
         print(self.board)
+

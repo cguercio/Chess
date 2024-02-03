@@ -15,6 +15,7 @@ class Screen:
     # Method takes in a list of lists of points and uses it to draw a checkered pattern.
     # This method works with any size grid
     def draw_squares(self, point_list, color1, color2):
+
         num_cols = len(point_list[0]) # Gets the number of cols by geting the length of the first list
         num_rows = len(point_list) # Gets the number of rows by getting the number of lists
 
@@ -47,8 +48,6 @@ class Screen:
         pygame.display.update()
 
     def draw_pieces(self, board):
-        num_cols = len(board[0]) # Gets the number of cols by geting the length of the first list
-        num_rows = len(board) # Gets the number of rows by getting the number of lists
         img = pygame.image.load('D:\Coding\Cloned Repositories\Chess\graphics\\b_rook_png_shadow_100px.png')
         for row in board:
             for piece in row:
