@@ -49,6 +49,13 @@
   - **Attributes:**
     - Color
     - Location
+  - **Sub-classes** - sub classes tell pieces how they are allowed to move
+    - pawn
+    - king
+    - queen
+    - knight
+    - rook
+    - bishop
 - Class Player
   - **Attributes:**
     - Color
@@ -57,6 +64,8 @@
     - Color
     - Location
 - Class Game
+  - Game class checks move for legality
+  - checks board for pins, checks, and checkmate
 - Class GUI
   -**Methods**
     -draw squares - draws a checkered pattern given list of list of points
