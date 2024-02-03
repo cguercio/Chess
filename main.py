@@ -7,9 +7,9 @@ def main():
     running = True
 
     screen = Screen(WIDTH, HEIGHT)
-    board = Board(8, 8, WHITE, BLACK)
+    board = Board(8, 8)
     point_list = board.squares()
-    screen.draw_squares(point_list)
+    screen.draw_squares(point_list, WHITE, GREEN)
 
     while running:
         clock.tick(FPS)
