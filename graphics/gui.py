@@ -1,6 +1,6 @@
 import pygame
-import math
 from constants import *
+from pieces import *
 pygame.init()
 pygame.font.init()
 
@@ -44,4 +44,15 @@ class Screen:
                     self.win.fill(color1, (point[0], point[1],
                                              self.width // num_cols, self.height // num_rows))
         
+        pygame.display.update()
+
+    def draw_pieces(self, board):
+        num_cols = len(board[0]) # Gets the number of cols by geting the length of the first list
+        num_rows = len(board) # Gets the number of rows by getting the number of lists
+        img = pygame.image.load('D:\Coding\Cloned Repositories\Chess\graphics\\b_rook_png_shadow_100px.png')
+        for row in board:
+            for piece in row:
+                if isinstance(piece, Piece):
+                    self.win.blit(img, (piece.x * 100 + 7, piece.y * 100 + 2))
+
         pygame.display.update()
