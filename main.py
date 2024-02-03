@@ -1,19 +1,21 @@
-from graphics import gui
-import pygame
-
+from graphics import *
+from constants import *
+from board import *
 
 def main():
     clock = pygame.time.Clock()
     running = True
 
-    screen = gui.Screen(WIDTH, HEIGHT)
-    screen.draw_squares()
+    screen = Screen(WIDTH, HEIGHT)
+    board = Board(8, 8, WHITE, BLACK)
+    point_list = board.squares()
+    screen.draw_squares(point_list)
 
     while running:
         clock.tick(FPS)
 
-        for event in gui.pygame.event.get():
-            if event.type == gui.pygame.QUIT:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
                 running = False
                 break
 

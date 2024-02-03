@@ -1,4 +1,6 @@
 import pygame
+import math
+from constants import *
 pygame.init()
 pygame.font.init()
 
@@ -13,9 +15,13 @@ class Screen:
         self.win = pygame.display.set_mode((self.width, self.height))
 
     def draw_squares(self, point_list):
+        for row in range(8):
+            point = (point_list[row][0])
+            self.win.fill(WHITE, (point[0], point[1], 100, 100))
 
-        for point in point_list:
-            self.win.fill(WHITE, (point[0], point[1], point_list[1][0] - point_list[0][0],
-                                   point_list[1][1] - point_list[0][1]))
+            for col in range(1,8, 1):
+                point = (point_list[row][col])
+                self.win.fill(BLACK, (point[0], point[1], 100, 100))
+
 
         pygame.display.update()
