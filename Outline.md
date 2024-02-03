@@ -43,6 +43,8 @@
 # Classes, Methods and Attributes Outline
 
 - Class Board
+  -**Methods**
+    - squares - Generates a list of lists for the number of rows and cols
 - Class Piece
   - **Attributes:**
     - Color
@@ -56,4 +58,6 @@
     - Location
 - Class Game
 - Class GUI
+  -**Methods**
+    -draw squares - draws a checkered pattern given list of list of points
 - Class Move
