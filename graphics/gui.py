@@ -48,10 +48,17 @@ class Screen:
         pygame.display.update()
 
     def draw_pieces(self, board):
-        img = pygame.image.load('D:\Coding\Cloned Repositories\Chess\graphics\\b_rook_png_shadow_100px.png')
+        num_cols = len(board[0]) # Gets the number of cols by geting the length of the first list
+        num_rows = len(board) # Gets the number of rows by getting the number of lists
+
+        # Loops throught the board, finds the pieces, centers and displays the pieces
         for row in board:
             for piece in row:
                 if isinstance(piece, Piece):
-                    self.win.blit(img, (piece.x * 100 + 7, piece.y * 100 + 2))
+                    img = pygame.image.load(piece.img)
+                    img_offset_x = (WIDTH // num_cols - img.get_width()) // 2 
+                    img_offset_y = (HEIGHT // num_rows - img.get_height()) // 2
+                    self.win.blit(img, (piece.x * WIDTH // num_cols + img_offset_x + 2,
+                                         piece.y * HEIGHT // num_rows + img_offset_y + 2))
 
         pygame.display.update()
