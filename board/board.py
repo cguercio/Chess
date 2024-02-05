@@ -19,6 +19,6 @@ class Board:
     def place_piece(self, piece):
         self.board[piece.x][piece.y] = piece
 
-    def update_piece(self, piece, x, y):
-        self.board[x][y] = []
+    def update_piece(self, piece, original_position):
+        self.board[original_position[0]][original_position[1]] = []
         self.board[piece.x][piece.y] = piece

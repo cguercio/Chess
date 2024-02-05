@@ -4,6 +4,7 @@ from board import *
 from pieces import *
 from player import *
 from utils import *
+from game import *
 import math
 
 def main():
@@ -53,6 +54,7 @@ def main():
 
     # Inititating player objects
     player_one = Player()
+    game = Game()
 
     # Placing the pieces on the board
     for item in Piece.instances:
@@ -73,14 +75,16 @@ def main():
             
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
-                move, piece, old_piece_x, old_piece_y = player_one.move(mouse_pos, board.board)
-                if move == True:
+                state, piece, original_position = player_one.move(mouse_pos, board.board)
+                if state == True:
                     wait()
                     mouse_pos2 = pygame.mouse.get_pos()
-                    piece.move(mouse_pos2)
-                    board.update_piece(piece, old_piece_x, old_piece_y)
-                    screen.draw_squares(square_list, WHITE, GREEN)
-                    screen.draw_pieces(board.board)
+                    new_position = mouse_pos_to_board_pos(mouse_pos2, board.board)
+                    if (piece.move(new_position, original_position) == True
+                        and game.check_move(board.board, piece, original_position) == True):
+                            board.update_piece(piece, original_position)
+                            screen.draw_squares(square_list, WHITE, GREEN)
+                            screen.draw_pieces(board.board)
 
 
                     
