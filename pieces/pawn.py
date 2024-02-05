@@ -1,6 +1,7 @@
 from pieces import Piece
 from constants import *
 import math
+import os
 
 class Pawn(Piece):
     def __init__(self, x, y, color):
@@ -10,9 +11,9 @@ class Pawn(Piece):
         self.color = color
 
         if self.color == BLACK:
-            self.img = 'D:\Coding\Cloned Repositories\Chess\graphics\\b_pawn_png_shadow_100px.png'
+            self.img = os.path.join(os.path.dirname(__file__),'..','graphics', 'b_pawn_png_shadow_100px.png')
         elif self.color  == WHITE:
-            self.img = 'D:\Coding\Cloned Repositories\Chess\graphics\\w_pawn_png_shadow_100px.png'
+            self.img = os.path.join(os.path.dirname(__file__),'..','graphics', 'w_pawn_png_shadow_100px.png')
 
     def move(self, pos):
         self.x = int(math.floor(pos[0]/100))
