@@ -15,17 +15,14 @@ class King(Piece):
         elif self.color  == WHITE:
             self.img = os.path.join(os.path.dirname(__file__),'..','graphics', 'w_king_png_shadow_100px.png')
 
-    def move(self, pos, original_position):
-        # Converts the mouse position to the new board
-        # position by rounding it down to the nearest 100.
-        new_posisition = (int(math.floor(pos[0]/100)),
-                           int(math.floor(pos[1]/100)))
+    def move(self, new_position, original_position):
+
         
         # Checks that the king only moves one square.
-        if (abs(new_posisition[0] - original_position[0]) > 1
-             or abs(new_posisition[1] - original_position[1]) > 1):
+        if (abs(new_position[0] - original_position[0]) > 1
+             or abs(new_position[1] - original_position[1]) > 1):
             return False
         else:
-            self.x = new_posisition[0]
-            self.y = new_posisition[1]
+            self.x = new_position[0]
+            self.y = new_position[1]
             return True 

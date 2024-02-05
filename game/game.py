@@ -55,7 +55,6 @@ class Game:
             and board[piece.x][piece.y].color == piece.color):
                 piece.x = original_position[0]
                 piece.y = original_position[1]
-                print("False")
                 return False
         
         # Governs the pawn capture logic.
@@ -69,7 +68,7 @@ class Game:
 
             # Checks for piece on pawn capture square
             elif (board[piece.x][piece.y] != []
-                  and piece.x - original_position[0] != 0):
+                and piece.x - original_position[0] != 0):
                 return True
                 
             # Checks if the pawn tries to capture, but there is no piece.

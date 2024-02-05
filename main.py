@@ -79,7 +79,8 @@ def main():
                 if state == True:
                     wait()
                     mouse_pos2 = pygame.mouse.get_pos()
-                    if (piece.move(mouse_pos2, original_position) == True
+                    new_position = mouse_pos_to_board_pos(mouse_pos2, board.board)
+                    if (piece.move(new_position, original_position) == True
                         and game.check_move(board.board, piece, original_position) == True):
                             board.update_piece(piece, original_position)
                             screen.draw_squares(square_list, WHITE, GREEN)
