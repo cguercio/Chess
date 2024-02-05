@@ -1,4 +1,5 @@
 from pieces import *
+from constants import *
 
 
 
@@ -6,8 +7,6 @@ class Game:
     
     # Checks if the move is blocked by another piece.
     def check_move(self, board, piece, original_position):
-        x_list = []
-        y_list = []
         num_points = max(abs(piece.x - original_position[0]), abs(piece.y - original_position[1]))
 
         # Builds a list of x points in between the original piece position
@@ -19,7 +18,6 @@ class Game:
         else:
             # If negative in x, we need to reverse the y list
             x_list = reversed([x for x in range(piece.x + 1, original_position[0], 1)])
-
 
         # Builds a list of y points in between the original piece position
         # and the new piece position.
@@ -40,10 +38,51 @@ class Game:
                 piece.x = original_position[0]
                 piece.y = original_position[1]
                 return False
-            else:   
-                pass
+
         
-        return True
+        # Checks if it is a valid capture.
+        if self.check_capture(board, piece, original_position) == True:
+            return True
+        else:
+            piece.x = original_position[0]
+            piece.y = original_position[1]
+            return False
+    
+    def check_capture(self, board, piece, original_position):
+
+        # Checks if the piece tries to capture its own color.
+        if (board[piece.x][piece.y] != []
+            and board[piece.x][piece.y].color == piece.color):
+                piece.x = original_position[0]
+                piece.y = original_position[1]
+                print("False")
+                return False
+        
+        # Governs the pawn capture logic.
+        if isinstance(piece, Pawn):
+
+            # Checks for piece in front of pawn and doesnt allow it to move.
+            if (board[piece.x][piece.y] != [] and piece.x - original_position[0] == 0):
+                piece.x = original_position[0]
+                piece.y = original_position[1]
+                return False
+
+            # Checks for piece on pawn capture square
+            elif (board[piece.x][piece.y] != []
+                  and piece.x - original_position[0] != 0):
+                return True
+                
+            # Checks if the pawn tries to capture, but there is no piece.
+            elif piece.x - original_position[0] != 0:
+                  piece.x = original_position[0]
+                  piece.y = original_position[1]
+                  return False
+            else: 
+                return True
+
+        else:
+            return True    
+        
 
 
 
