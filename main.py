@@ -75,15 +75,15 @@ def main():
             
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
-                move, piece, old_piece_x, old_piece_y = player_one.move(mouse_pos, board.board)
-                if move == True:
+                state, piece, original_position = player_one.move(mouse_pos, board.board)
+                if state == True:
                     wait()
                     mouse_pos2 = pygame.mouse.get_pos()
-                    piece.move(mouse_pos2)
-                    if game.check_move(board.board, piece, old_piece_x, old_piece_y) == True:
-                        board.update_piece(piece, old_piece_x, old_piece_y)
-                        screen.draw_squares(square_list, WHITE, GREEN)
-                        screen.draw_pieces(board.board)
+                    if (piece.move(mouse_pos2, original_position) == True
+                        and game.check_move(board.board, piece, original_position) == True):
+                            board.update_piece(piece, original_position)
+                            screen.draw_squares(square_list, WHITE, GREEN)
+                            screen.draw_pieces(board.board)
 
 
                     
