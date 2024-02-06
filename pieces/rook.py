@@ -18,11 +18,24 @@ class Rook(Piece):
                                                 'w_rook_png_shadow_100px.png')
 
     def move(self, new_position, original_position):
+        """
+        Checks that the rook only moves along a row or column.
 
-        if (new_position[0] - original_position[0] != 0 
-            and new_position[1] - original_position[1] != 0):
+        Args:
+            new_position (tuple): Position to which the piece is to be moved.
+            original_position (tuple): Original position of piece.
+
+        Returns:
+            boolean: Returns True if move is valid, returns False otherwise.
+        """
+        
+        old_col, old_row = original_position
+        new_col, new_row = new_position
+
+        # Checks if the rook only moves along a row or column.
+        if (new_col - old_col != 0 and new_row - old_row != 0):
             return False
-        else:
-            self.x = new_position[0]
-            self.y = new_position[1]
-            return True
+
+        self.x = new_col
+        self.y = new_row
+        return True

@@ -16,11 +16,24 @@ class Bishop(Piece):
             self.img = os.path.join(os.path.dirname(__file__),'..','graphics', 'w_bishop_png_shadow_100px.png')
 
     def move(self, new_position, original_position):
+        """
+        Checks that the bishop moves only on diagonals.
+
+        Args:
+            new_position (tuple): Position to which the piece is to be moved.
+            original_position (tuple): Original position of piece.
+
+        Returns:
+            boolean: True if move is valid, False otherwise.
+        """
+        
+        old_col, old_row = original_position
+        new_col, new_row = new_position
         
         # Checks that the bishop only moves on a diagonal.
-        if (abs(new_position[0] - original_position[0]) != abs(new_position[1] - original_position[1])):
+        if (abs(new_col - old_col) != abs(new_row - old_row)):
             return False
-        else:
-            self.x = new_position[0]
-            self.y = new_position[1]
-            return True
+
+        self.x = new_col
+        self.y = new_row
+        return True

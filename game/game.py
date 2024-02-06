@@ -5,83 +5,117 @@ from constants import *
 
 class Game:
     
+    
     # Checks if the move is blocked by another piece.
     def check_move(self, board, piece, original_position):
-        num_points = max(abs(piece.x - original_position[0]), abs(piece.y - original_position[1]))
+        """
+        Checks if a move is valid for a given chess piece on the board.
+
+        Args:
+            board (list): The chessboard as a 2D list
+            piece (object): The chess piece to be moved.
+            original_position (tuple): The original position of the piece.
+
+        Returns:
+            Boolean: True if move is valid, False otherwise.
+        """
+        old_col, old_row = original_position
+        new_col, new_row = piece.x, piece.y
+        num_points = max(abs(new_col - old_col), abs(new_row - old_row))
 
         # Builds a list of x points in between the original piece position
         # and the new piece position.
-        if piece.x - original_position[0] == 0:
-            x_list = [piece.x for _ in range(1, num_points, 1)]
-        elif piece.x - original_position[0] > 0:
-            x_list = [x for x in range(original_position[0] + 1, piece.x, 1)]
+        if new_col - old_col == 0:
+            x_points = [new_col for _ in range(1, num_points)]
+        elif new_col - old_col > 0:
+            x_points = [x for x in range(old_col + 1, new_col)]
         else:
-            # If negative in x, we need to reverse the y list
-            x_list = reversed([x for x in range(piece.x + 1, original_position[0], 1)])
+            x_points = [x for x in range(old_col - 1, new_col, -1)]
 
         # Builds a list of y points in between the original piece position
         # and the new piece position.
-        if piece.y - original_position[1] == 0:
-            y_list = [piece.y for _ in range(1, num_points, 1)]
-        elif piece.y - original_position[1] > 0:
-            y_list = [y for y in range(original_position[1] + 1, piece.y, 1)]
+        if new_row - old_row == 0:
+            y_points = [new_row for _ in range(1, num_points)]
+        elif new_row - old_row > 0:
+            y_points = [y for y in range(old_row + 1, new_row)]
         else:
-            # If negative in y, we need to reverse the y list
-            y_list = reversed([y for y in range(piece.y + 1, original_position[1], 1)])
+            y_points =[y for y in range(old_row - 1, new_row, -1)]
 
         # Combines the x and y lists into a list of points.
-        piece_path = list(zip(x_list, y_list))
+        piece_path = list(zip(x_points, y_points))
 
         # Checks if there is a piece in the move path.
         for point in piece_path:
             if board[point[0]][point[1]] != []:
-                piece.x = original_position[0]
-                piece.y = original_position[1]
+                self.reset_piece(piece, old_col, old_row)
                 return False
 
-        
         # Checks if it is a valid capture.
-        if self.check_capture(board, piece, original_position) == True:
+        if self.check_capture(board, piece, new_col, new_row, old_col, old_row) == True:
             return True
-        else:
-            piece.x = original_position[0]
-            piece.y = original_position[1]
-            return False
+
+        self.reset_piece(piece, old_col, old_row)
+        return False
     
-    def check_capture(self, board, piece, original_position):
+    def check_capture(self, board, piece, new_col, new_row, old_col, old_row):
+        """
+        Checks that the pieces only capture pieces of opposite color.
 
+        Args:
+            board (list): The chessboard as a 2D list
+            piece (object): The chess piece to be moved.
+            original_position (tuple): The original position of the piece.
+
+        Returns:
+            Boolean: True if capture is valid, False otherwise.
+        """
+        
         # Checks if the piece tries to capture its own color.
-        if (board[piece.x][piece.y] != []
-            and board[piece.x][piece.y].color == piece.color):
-                piece.x = original_position[0]
-                piece.y = original_position[1]
+        if (board[new_col][new_row]
+            and board[new_col][new_row].color == piece.color):
+                self.reset_piece(piece, old_col, old_row)
                 return False
         
-        # Governs the pawn capture logic.
+        # Calls pawn capture logic if piece is a pawn.
         if isinstance(piece, Pawn):
+            return self.check_pawn_capture(board, piece, new_col, new_row, old_col, old_row)
 
-            # Checks for piece in front of pawn and doesnt allow it to move.
-            if (board[piece.x][piece.y] != [] and piece.x - original_position[0] == 0):
-                piece.x = original_position[0]
-                piece.y = original_position[1]
-                return False
-
-            # Checks for piece on pawn capture square
-            elif (board[piece.x][piece.y] != []
-                and piece.x - original_position[0] != 0):
-                return True
-                
-            # Checks if the pawn tries to capture, but there is no piece.
-            elif piece.x - original_position[0] != 0:
-                  piece.x = original_position[0]
-                  piece.y = original_position[1]
-                  return False
-            else: 
-                return True
-
-        else:
-            return True    
+        return True
         
+    def check_pawn_capture(self, board, piece, new_col, new_row, old_col, old_row):
+        """
+        Checks for pieces in front of moving pawns and checks for piece when pawn
+        tries to capture.
+
+        Args:
+            board (list): The chessboard in a 2D list.
+            piece (object): The chess piece to be moved.
+            new_row (int): Board row to move piece to.
+            new_col (int): Board column to move piece to,
+            old_row (int): Board row where piece was.
+            old_col (int): Board column where piece was.
+
+        Returns:
+            boolean: True if capture is valid, False otherwise.
+        """
+        
+        # Check if piece is in front of moving pawn, disallowing movement or capture.
+        if (board[new_row][new_col] and new_row == old_row):
+            self.reset_piece(piece, old_col, old_row)
+            return False
+        
+        # Checks if pawn tries move to capture square but there is
+        # no piece to capture, disallow capture or movement.
+        elif not board[new_col][new_row] and new_col != old_col:
+            self.reset_piece(piece, old_col, old_row)
+            return False
+        
+        return True
+        
+    def reset_piece(self, piece, old_col, old_row):
+        # Resets the piece position to the square before the move.
+        piece.x = old_col
+        piece.y = old_row
 
 
 
