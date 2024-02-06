@@ -19,27 +19,27 @@ class Game:
         Returns:
             Boolean: True if move is valid, False otherwise.
         """
-        old_row, old_col = original_position
-        new_row, new_col = piece.x, piece.y
-        num_points = max(abs(new_row - old_row), abs(new_col - old_col))
+        old_col, old_row = original_position
+        new_col, new_row = piece.x, piece.y
+        num_points = max(abs(new_col - old_col), abs(new_row - old_row))
 
         # Builds a list of x points in between the original piece position
         # and the new piece position.
-        if new_row - old_row == 0:
-            x_points = [new_row for _ in range(1, num_points)]
-        elif new_row - old_row > 0:
-            x_points = [x for x in range(old_row + 1, new_row)]
+        if new_col - old_col == 0:
+            x_points = [new_col for _ in range(1, num_points)]
+        elif new_col - old_col > 0:
+            x_points = [x for x in range(old_col + 1, new_col)]
         else:
-            x_points = [x for x in range(old_row - 1, new_row, -1)]
+            x_points = [x for x in range(old_col - 1, new_col, -1)]
 
         # Builds a list of y points in between the original piece position
         # and the new piece position.
-        if new_col - old_col == 0:
-            y_points = [new_col for _ in range(1, num_points)]
-        elif new_col - old_col > 0:
-            y_points = [y for y in range(old_col + 1, new_col)]
+        if new_row - old_row == 0:
+            y_points = [new_row for _ in range(1, num_points)]
+        elif new_row - old_row > 0:
+            y_points = [y for y in range(old_row + 1, new_row)]
         else:
-            y_points =[y for y in range(old_col - 1, new_col, -1)]
+            y_points =[y for y in range(old_row - 1, new_row, -1)]
 
         # Combines the x and y lists into a list of points.
         piece_path = list(zip(x_points, y_points))
@@ -47,17 +47,17 @@ class Game:
         # Checks if there is a piece in the move path.
         for point in piece_path:
             if board[point[0]][point[1]] != []:
-                self.reset_piece(piece, old_row, old_col)
+                self.reset_piece(piece, old_col, old_row)
                 return False
 
         # Checks if it is a valid capture.
-        if self.check_capture(board, piece, original_position) == True:
+        if self.check_capture(board, piece, new_col, new_row, old_col, old_row) == True:
             return True
 
-        self.reset_piece(piece, old_row, old_col)
+        self.reset_piece(piece, old_col, old_row)
         return False
     
-    def check_capture(self, board, piece, original_position):
+    def check_capture(self, board, piece, new_col, new_row, old_col, old_row):
         """
         Checks that the pieces only capture pieces of opposite color.
 
@@ -70,22 +70,19 @@ class Game:
             Boolean: True if capture is valid, False otherwise.
         """
         
-        old_row, old_col = original_position
-        new_row, new_col = piece.x, piece.y
-
         # Checks if the piece tries to capture its own color.
-        if (board[new_row][new_col]
-            and board[new_row][new_col].color == piece.color):
-                self.reset_piece(piece, old_row, old_col)
+        if (board[new_col][new_row]
+            and board[new_col][new_row].color == piece.color):
+                self.reset_piece(piece, old_col, old_row)
                 return False
         
         # Calls pawn capture logic if piece is a pawn.
         if isinstance(piece, Pawn):
-            return self.check_pawn_capture(board, piece, new_row, new_col, old_row, old_col)
+            return self.check_pawn_capture(board, piece, new_col, new_row, old_col, old_row)
 
         return True
         
-    def check_pawn_capture(self, board, piece, new_row, new_col, old_row, old_col ):
+    def check_pawn_capture(self, board, piece, new_col, new_row, old_col, old_row):
         """
         Checks for pieces in front of moving pawns and checks for piece when pawn
         tries to capture.
@@ -104,21 +101,21 @@ class Game:
         
         # Check if piece is in front of moving pawn, disallowing movement or capture.
         if (board[new_row][new_col] and new_row == old_row):
-            self.reset_piece(piece, old_row, old_col)
+            self.reset_piece(piece, old_col, old_row)
             return False
         
         # Checks if pawn tries move to capture square but there is
         # no piece to capture, disallow capture or movement.
-        elif not board[new_row][new_col] and new_row != old_row:
-            self.reset_piece(piece, old_row, old_col)
+        elif not board[new_col][new_row] and new_col != old_col:
+            self.reset_piece(piece, old_col, old_row)
             return False
         
         return True
         
-    def reset_piece(self, piece, old_row, old_col):
+    def reset_piece(self, piece, old_col, old_row):
         # Resets the piece position to the square before the move.
-        piece.x = old_row
-        piece.y = old_col
+        piece.x = old_col
+        piece.y = old_row
 
 
 

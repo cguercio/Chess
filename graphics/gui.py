@@ -46,6 +46,7 @@ class Screen:
             board (list): The chessboard as a 2D list
         """
         
+        # Gets the size of the board in x and y.
         num_cols = len(board[0])
         num_rows = len(board)
 

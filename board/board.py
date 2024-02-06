@@ -29,7 +29,6 @@ class Board:
 
     
     def place_piece(self, piece):
-        row, col = piece.x, piece.y
         """
         Places the piece on the board
         
@@ -40,8 +39,9 @@ class Board:
             None
         
         """
+        col, row = piece.x, piece.y
         # Places the piece on the board.
-        self.board[row][col] = piece
+        self.board[col][row] = piece
 
     def update_piece(self, piece, original_position):
         """
@@ -54,11 +54,12 @@ class Board:
         Returns:
             None
         """
-        old_row, old_col = original_position
-        new_row, new_col = piece.x, piece.y
+        old_col, old_row = original_position
+        new_col, new_row = piece.x, piece.y
         
         # Removes a piece from its original position.
-        self.board[old_row][old_col] = []
+        self.board[old_col][old_row] = []
         
         # Places the piece at its new position.
-        self.board[new_row][new_col] = piece
+        self.board[new_col][new_row] = piece
+

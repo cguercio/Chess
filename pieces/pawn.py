@@ -17,57 +17,42 @@ class Pawn(Piece):
             self.img = os.path.join(os.path.dirname(__file__),'..','graphics', 'w_pawn_png_shadow_100px.png')
 
     def move(self, new_position, original_position):
+        """
+        Allows pawns to move only square forward unless it is on
+        it's starting square in which case it can move two.
+        Allows one square in diagonal movement for captures.   
 
-        # Checks if the pawn is on its first move then allows it to move one or two squares.
-        # If the pawn is not on its first move, then checks for only one more forward.
-        # Allows the pawn to move forward diagonally for one square to allow for captures.
-        if self.color == WHITE: # Checks for white pawns
-            if (original_position == self.starting_pos
-                and new_position[1] - original_position[1] in (-2, -1)):
-                if (new_position[1] - original_position[1] == -2
-                    and new_position[0] - original_position[0] == 0):
-                    self.x = new_position[0]
-                    self.y = new_position[1]
-                    return True 
-                
-                elif (new_position[1] - original_position[1] == -1
-                    and new_position[0] - original_position[0] in (-1, 0, 1)):
-                    self.x = new_position[0]
-                    self.y = new_position[1]
-                    return True
-                
-                else:
-                    return False
-                
-            elif (new_position[1] - original_position[1] == -1 
-                    and new_position[0] - original_position[0] in (-1, 0, 1)):
-                self.x = new_position[0]
-                self.y = new_position[1]
-                return True
+        Args:
+            new_position (tuple): Position to which piece is to be moved.
+            original_position (tuple): Original position of piece.
 
-        # Checks for black pawns
-        elif (original_position == self.starting_pos 
-              and new_position[1] - original_position[1] in (2, 1)):
-            if (new_position[1] - original_position[1] == 2 
-                and new_position[0] - original_position[0] == 0):
-                self.x = new_position[0]
-                self.y = new_position[1]
-                return True 
-            
-            elif (new_position[1] - original_position[1] == 1
-                  and new_position[0] - original_position[0] in (-1, 0, 1)):
-                self.x = new_position[0]
-                self.y = new_position[1]
-                return True
-            
-            else:
-                return False
-            
-        elif (new_position[1] - original_position[1] == 1
-              and new_position[0] - original_position[0] in (-1, 0, 1)):
-            self.x = new_position[0]
-            self.y = new_position[1]
-            return True 
+        Returns:
+            boolean: Return True if move is valid, False otherwise.
+        """
         
-        else:
+        old_col, old_row = original_position
+        new_col, new_row = new_position
+        col_diff = abs(new_col - old_col)
+        row_diff = abs(new_row - old_row)
+        
+        # Check if the pawn is moving only in y.
+        if col_diff == 0:
+            # Check if pawn is at starting pos and moves more than 2.
+            if original_position == self.starting_pos and row_diff > 2:
+                return False
+            # Check if pawn is not at starting pos and moves more than 1.
+            if original_position != self.starting_pos and row_diff > 1:
+                return False
+            # check if the pawn is moving backwards.
+            if self.color == WHITE and new_row - old_row > 0:
+                return False
+            if self.color == BLACK and new_row - old_row < 0:
+                return False
+        # Check if the pawn is moving more than 1 diagonally.
+        elif col_diff == 1 and row_diff != 1:
             return False
+
+        # Update piece position and allow movement.
+        self.x = new_col
+        self.y = new_row
+        return True

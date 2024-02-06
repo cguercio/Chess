@@ -27,13 +27,13 @@ class Bishop(Piece):
             boolean: True if move is valid, False otherwise.
         """
         
-        old_row, old_col = original_position
-        new_row, new_col = new_position
+        old_col, old_row = original_position
+        new_col, new_row = new_position
         
         # Checks that the bishop only moves on a diagonal.
-        if (abs(new_row - old_row) != abs(new_col - old_col)):
+        if (abs(new_col - old_col) != abs(new_row - old_row)):
             return False
 
-        self.x = new_row
-        self.y = new_col
+        self.x = new_col
+        self.y = new_row
         return True

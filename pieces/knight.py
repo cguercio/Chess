@@ -28,14 +28,16 @@ class Knight(Piece):
             boolean: True if move is valid, False otherwise.
         """
         
-        old_row, old_col = original_position
-        new_row, new_col = new_position
-        row_diff = abs(new_row - old_row)
+        old_col, old_row = original_position
+        new_col, new_row = new_position
         col_diff = abs(new_col - old_col)
+        row_diff = abs(new_row - old_row)
         
-        if (row_diff == 2 and col_diff == 1) or (row_diff == 1 and col_diff == 2):
-            self.x = new_row
-            self.y = new_col
+        # Checks that the knight moves either two squares in one
+        # direction and one in the other.
+        if (col_diff == 2 and row_diff == 1) or (col_diff == 1 and row_diff == 2):
+            self.x = new_col
+            self.y = new_row
             return True
         
         return False
