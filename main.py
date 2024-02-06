@@ -16,7 +16,7 @@ def main():
     square_list = board.squares()
     screen.draw_squares(square_list, WHITE, GREEN)
 
-    # Inititating black piece objects: qs = queens-side, ks = kings-side
+    # Initiating black piece objects: qs = queens-side, ks = kings-side
     qs_rook = Rook(0, 0, BLACK)
     qs_knight = Knight(1, 0, BLACK)
     qs_bishop = Bishop(2, 0, BLACK)
@@ -52,7 +52,7 @@ def main():
     wpawn7 = Pawn(6, 6, WHITE)
     wpawn8 = Pawn(7, 6, WHITE)
 
-    # Inititating player objects
+    # Initiating player objects
     player_one = Player()
     game = Game()
 

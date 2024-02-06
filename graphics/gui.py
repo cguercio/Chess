@@ -15,50 +15,49 @@ class Screen:
     # Method takes in a list of lists of points and uses it to draw a checkered pattern.
     # This method works with any size grid
     def draw_squares(self, point_list, color1, color2):
+        """
+        Iterates over a list of points and fills a checkered pattern
 
-        num_cols = len(point_list[0]) # Gets the number of cols by geting the length of the first list
-        num_rows = len(point_list) # Gets the number of rows by getting the number of lists
+        Args:
+            point_list (list): List of points corresponding to the location of squares.
+            color1 (RGB): First color to draw.
+            color2 (RGB): Second color to draw.
+        """
 
-        # Iterates over every other row starting at 1st row.
-        for row in range(0,num_rows,2):
-            for col in range(num_cols):
-
-                # If col row is even fill with color 1.
-                if col % 2 == 0:
-                    point = (point_list[row][col]) # This is here to access the elements in the points using idexing.
-                    self.win.fill(color1, (point[0], point[1],
-                                            self.width // num_cols, self.height // num_rows))
-                else: # If col row is odd fill with color 2.
-                    point = (point_list[row][col]) # This is here to access the elements in the points using idexing.
-                    self.win.fill(color2, (point[0], point[1],
-                                             self.width // num_cols, self.height // num_rows))
+        num_cols = len(point_list[0])
+        num_rows = len(point_list)
+        square_width = self.width // num_cols
+        square_height = self.height // num_rows
         
-        # Iterates over every other row starting at 2nd row.
-        for row in range(1,num_rows,2):
-            for col in range(num_cols):
-                if col % 2 == 0: # If col row is even fill with color 1.
-                    point = (point_list[row][col]) # This is here to access the elements in the points using idexing.
-                    self.win.fill(color2, (point[0], point[1],
-                                             self.width // num_cols, self.height // num_rows))
-                else:# If col row is odd fill with color 2.
-                    point = (point_list[row][col]) # This is here to access the elements in the points using idexing.
-                    self.win.fill(color1, (point[0], point[1],
-                                             self.width // num_cols, self.height // num_rows))
-        
+        # Iterates over the list of points and fills in the checkered pattern.
+        for row in range(num_rows):
+            for col, point in enumerate(point_list[row]):
+                fill_color = color1 if (row + col) % 2 == 0 else color2
+                self.win.fill(fill_color, (point[0], point[1],
+                                            square_width, square_height))
+
         pygame.display.update()
 
     def draw_pieces(self, board):
-        num_cols = len(board[0]) # Gets the number of cols by geting the length of the first list
-        num_rows = len(board) # Gets the number of rows by getting the number of lists
+        """
+        Loops through the chessboard, finds the pieces, centers and displays the pieces.
 
-        # Loops throught the board, finds the pieces, centers and displays the pieces
+        Args:
+            board (list): The chessboard as a 2D list
+        """
+        
+        num_cols = len(board[0])
+        num_rows = len(board)
+
+        # Loops through the board, finds the pieces, centers and displays the pieces
         for row in board:
             for piece in row:
                 if isinstance(piece, Piece):
                     img = pygame.image.load(piece.img)
-                    img_offset_x = (WIDTH // num_cols - img.get_width()) // 2 
-                    img_offset_y = (HEIGHT // num_rows - img.get_height()) // 2
-                    self.win.blit(img, (piece.x * WIDTH // num_cols + img_offset_x + 2,
-                                         piece.y * HEIGHT // num_rows + img_offset_y + 2))
+                    img_offset_x = (WIDTH // num_cols - img.get_width()) // 2 + 2
+                    img_offset_y = (HEIGHT // num_rows - img.get_height()) // 2 + 2
+                    x_pos = piece.x * WIDTH // num_cols + img_offset_x
+                    y_pos = piece.y * HEIGHT // num_rows + img_offset_y
+                    self.win.blit(img, (x_pos, y_pos))
 
         pygame.display.update()

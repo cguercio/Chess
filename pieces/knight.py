@@ -16,18 +16,28 @@ class Knight(Piece):
             self.img = os.path.join(os.path.dirname(__file__),'..','graphics', 'w_knight_png_shadow_100px.png')
 
     def move(self, new_position, original_position):
-        
-        # Checks if the knight moves only 2 in one direction and only 1 in the other.
-        if (abs(new_position[0] - original_position[0]) == 1 
-            and abs(new_position[1] - original_position[1]) == 2):
-            self.x = new_position[0]
-            self.y = new_position[1]
-            return True
-        elif (abs(new_position[1] - original_position[1]) == 1 
-            and abs(new_position[0] - original_position[0]) == 2):
-            self.x = new_position[0]
-            self.y = new_position[1]
-            return True
-        else:
+        """
+        Checks that the knight moves either two squares in one
+        direction and one in the other.
 
-            return False
+        Args:
+            new_position (tuple): Position to which piece is to be moved.
+            original_position (tuple): Original position of piece.
+
+        Returns:
+            boolean: True if move is valid, False otherwise.
+        """
+        
+        old_row, old_col = original_position
+        new_row, new_col = new_position
+        row_diff = abs(new_row - old_row)
+        col_diff = abs(new_col - old_col)
+        
+        if (row_diff == 2 and col_diff == 1) or (row_diff == 1 and col_diff == 2):
+            self.x = new_row
+            self.y = new_col
+            return True
+        
+        return False
+            
+        
