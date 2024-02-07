@@ -3,8 +3,9 @@ from constants import *
 import pygame
 
 class Player:
-    def __init__(self):
-        pass
+    def __init__(self, turn, color):
+        self.turn = turn
+        self.color = color
 
     def move(self, pos, board):
         num_cols = len(board[0]) # Gets the number of cols by getting the length of the first list

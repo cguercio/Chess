@@ -1,5 +1,7 @@
 from pieces import *
 from constants import *
+from player import *
+
 
 
 
@@ -49,21 +51,19 @@ class Game:
                 return False
                 
 
-        # Checks if there is a piece in the move path.
-        # for point in piece_path:
-        #     if board[point[0]][point[1]] != []:
-        #         self.reset_piece(piece, old_col, old_row)
-        #         return False
-
-        # Checks if it is a valid capture.
-        if self.can_capture(board, piece, new_col, new_row, old_col, old_row) == False:
+        # Checks if a piece is trying to capture and if it is a valid capture.
+        if (board[new_col][new_row] and
+        self.can_capture(board, piece, new_col, new_row) == False):
             self.reset_piece(piece, old_col, old_row)
             return False
         
+        # Calls pawn capture logic if piece is a pawn.
+        if isinstance(piece, Pawn):
+            return self.pawn_can_capture(board, piece, new_col, new_row, old_col, old_row)
         
         return True
     
-    def can_capture(self, board, piece, new_col, new_row, old_col, old_row):
+    def can_capture(self, board, piece, new_col, new_row):
         """
         Checks that the pieces only capture pieces of opposite color.
 
@@ -77,24 +77,13 @@ class Game:
         """
         
         # Checks if the piece tries to capture its own color.
-        if (board[new_col][new_row]
-            and board[new_col][new_row].color == piece.color):
+        if board[new_col][new_row].color == piece.color:
                 return False
         
-        # Calls pawn capture logic if piece is a pawn.
-        if isinstance(piece, Pawn):
-            return self.pawn_can_capture(board, new_col, new_row, old_col, old_row)
-        
-        try:
-            board[new_col][new_row].is_captured = True
-            board[new_col][new_row].check_capture()
-            print(board[new_col][new_row].is_captured)
-        except:
-            pass
-            
+        self.update_capture(board, new_col, new_row)
         return True
         
-    def pawn_can_capture(self, board, new_col, new_row, old_col, old_row):
+    def pawn_can_capture(self, board, piece, new_col, new_row, old_col, old_row):
         """
         Checks for pieces in front of moving pawns and checks for piece when pawn
         tries to capture.
@@ -113,46 +102,81 @@ class Game:
         
         # Check if piece is in front of moving pawn, disallowing movement or capture.
         if (board[new_col][new_row] and new_col == old_col):
+            self.reset_piece(piece, old_col, old_row)
             return False
         
         # Checks if pawn tries move to capture square but there is
         # no piece to capture, disallow capture or movement.
         elif not board[new_col][new_row] and new_col != old_col:
+            self.reset_piece(piece, old_col, old_row)
             return False
         
+        print(board[new_col][new_row])
+        print(board)
+        self.update_capture(board, new_col, new_row)        
         return True
     
-    def in_check(self, board):
-        for piece in Piece.instances:
-            if isinstance(piece, King) and piece.color == WHITE:
-                white_king = (piece.x, piece.y)
-            elif isinstance(piece, King) and piece.color == BLACK:
-                black_king = (piece.x, piece.y)
-        
-        for piece in Piece.instances:
-            pos = (piece.x, piece.y)
-            if piece.color == BLACK:
-                if (piece.move(white_king, (piece.x, piece.y)) == True
-                        and self.can_move(board, piece, pos) == True):
-                    piece.x = pos[0]
-                    piece.y = pos[1]
-                    print(piece)
-                    print("White king in check.")
-                    return False
-            if piece.color == WHITE:
-                if (piece.move(black_king, (piece.x, piece.y)) == True
-                        and self.can_move(board, piece, pos) == True):
-                    piece.x = pos[0]
-                    piece.y = pos[1]
-                    print(piece)
-                    print("Black king in check.")
-                    return False
+    def in_check(self, board, w_king, b_king):
+        """
+        Checks both kings for check and sets check
+        attribute to True if necessary.
 
+        Args:
+            board (list): Chess board as a 2D list.
+            w_king (object): White king.
+            b_king (object): Black king.
+        """
+        
+        # Getting king's positions.
+        white_king = (w_king.x, w_king.y)
+        black_king = (b_king.x, b_king.y)
 
+        # Looping thought piece objects.
+        for piece in Piece.instances:
+            old_col, old_row = piece.x, piece.y
+            # Trying to move all black pieces to the white king.
+            if (piece.color == BLACK and piece.move((white_king), (piece.x, piece.y)) == True
+                and self.can_move(board, piece, (old_col, old_row)) == True):
+                self.reset_piece(piece, old_col, old_row)
+                w_king.check = True
+                print("White in check.")
+
+            elif (piece.color == WHITE and piece.move((black_king), (piece.x, piece.y)) == True
+                and self.can_move(board, piece, (old_col, old_row)) == True):
+                self.reset_piece(piece, old_col, old_row)
+                b_king.check = True
+                print("Black in check.")
+                return
+
+            # Trying to move all white pieces to the black king.
+            
+        w_king.check = False
+        b_king.check = False
         
-        
-        
+    def update_capture(self, board, new_col, new_row):
+        """
+        Tries to sets the object's is_captured attribute to true.
+
+        Args:
+            board (list): Chess board represented as a 2D list.
+            new_col (int): New piece column
+            new_row (int): New piece row.
+        """
+        try:
+            board[new_col][new_row].is_captured = True
+            board[new_col][new_row].check_capture()
+        except Exception:
+            pass
+
     def reset_piece(self, piece, old_col, old_row):
+        """
+        Resets the piece back to its original square.
+
+        Args:
+            piece (object): Piece to be reset.
+            old_col (int): Old piece column.
+            old_row (int): Old piece row.
+        """
         # Resets the piece position to the square before the move.
         piece.x = old_col
         piece.y = old_row

@@ -52,6 +52,7 @@ class Pawn(Piece):
         elif col_diff > 1 or row_diff > 1 or col_diff == 1 and row_diff != 1:
             return False
 
+        print("1")
         # Update piece position and allow movement.
         self.x = new_col
         self.y = new_row

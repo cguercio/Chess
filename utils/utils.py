@@ -1,6 +1,8 @@
 import pygame
 import math
 from constants import *
+from pieces import *
+from game import *
 
 
 def wait():
@@ -19,3 +21,18 @@ def mouse_pos_to_board_pos(pos, board):
 
     return (int(math.floor(pos[0] // square_width)), int(math.floor(pos[1] // square_height)))
 
+def valid_move(piece, board, new_position, original_position, game, w_king, b_king, player):
+    
+    if piece.move(new_position, original_position) == False:
+        return False
+    if game.can_move(board, piece, original_position) == False:
+        return False
+    
+    game.in_check(board, w_king, b_king)
+    
+    if w_king.check == True and player.color == WHITE:
+        return False
+    elif b_king.check == True and player.color == BLACK:
+        return False
+    
+    return True

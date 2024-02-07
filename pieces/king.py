@@ -9,6 +9,7 @@ class King(Piece):
         self.x = x
         self.y = y
         self.color = color
+        self.check = False
 
         if self.color == BLACK:
             self.img = os.path.join(os.path.dirname(__file__),'..','graphics', 'b_king_png_shadow_100px.png')
@@ -45,4 +46,4 @@ class King(Piece):
         changes removes the piece from the piece list.
         """
         if self.is_captured:
-            print("in check")
+            pass
