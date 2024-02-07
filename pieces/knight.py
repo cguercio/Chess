@@ -41,5 +41,13 @@ class Knight(Piece):
             return True
         
         return False
+    
+    def check_capture(self):
+        """
+        Checks if the piece has been captured and 
+        changes removes the piece from the piece list.
+        """
+        if self.is_captured:
+            Piece.instances.remove(self)
             
         

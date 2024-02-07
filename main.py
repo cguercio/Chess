@@ -20,8 +20,8 @@ def main():
     qs_rook = Rook(0, 0, BLACK)
     qs_knight = Knight(1, 0, BLACK)
     qs_bishop = Bishop(2, 0, BLACK)
-    queen = Queen(3, 0, BLACK)
-    king = King(4, 0, BLACK)
+    b_queen = Queen(3, 0, BLACK)
+    b_king = King(4, 0, BLACK)
     ks_bishop = Bishop(5, 0, BLACK)
     ks_knight = Knight(6, 0, BLACK)
     ks_rook = Rook(7, 0, BLACK)
@@ -38,8 +38,8 @@ def main():
     qs_rook = Rook(0, 7, WHITE)
     qs_knight = Knight(1, 7, WHITE)
     qs_bishop = Bishop(2, 7, WHITE)
-    queen = Queen(3, 7, WHITE)
-    king = King(4, 7, WHITE)
+    w_queen = Queen(3, 7, WHITE)
+    w_king = King(4, 7, WHITE)
     ks_bishop = Bishop(5, 7, WHITE)
     ks_knight = Knight(6, 7, WHITE)
     ks_rook = Rook(7, 7, WHITE)
@@ -81,7 +81,8 @@ def main():
                     mouse_pos2 = pygame.mouse.get_pos()
                     new_position = mouse_pos_to_board_pos(mouse_pos2, board.board)
                     if (piece.move(new_position, original_position) == True
-                        and game.check_move(board.board, piece, original_position) == True):
+                        and game.can_move(board.board, piece, original_position) == True):
+                            game.in_check(board.board)
                             board.update_piece(piece, original_position)
                             screen.draw_squares(square_list, WHITE, GREEN)
                             screen.draw_pieces(board.board)

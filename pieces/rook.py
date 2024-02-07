@@ -39,3 +39,11 @@ class Rook(Piece):
         self.x = new_col
         self.y = new_row
         return True
+    
+    def check_capture(self):
+        """
+        Checks if the piece has been captured and 
+        changes removes the piece from the piece list.
+        """
+        if self.is_captured:
+            Piece.instances.remove(self)

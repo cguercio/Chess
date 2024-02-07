@@ -5,9 +5,8 @@ from constants import *
 
 class Game:
     
-    
     # Checks if the move is blocked by another piece.
-    def check_move(self, board, piece, original_position):
+    def can_move(self, board, piece, original_position):
         """
         Checks if a move is valid for a given chess piece on the board.
 
@@ -43,21 +42,28 @@ class Game:
 
         # Combines the x and y lists into a list of points.
         piece_path = list(zip(x_points, y_points))
-
-        # Checks if there is a piece in the move path.
-        for point in piece_path:
-            if board[point[0]][point[1]] != []:
+        
+        for pieces in Piece.instances:
+            if (pieces.x, pieces.y) in piece_path:
                 self.reset_piece(piece, old_col, old_row)
                 return False
+                
+
+        # Checks if there is a piece in the move path.
+        # for point in piece_path:
+        #     if board[point[0]][point[1]] != []:
+        #         self.reset_piece(piece, old_col, old_row)
+        #         return False
 
         # Checks if it is a valid capture.
-        if self.check_capture(board, piece, new_col, new_row, old_col, old_row) == True:
-            return True
-
-        self.reset_piece(piece, old_col, old_row)
-        return False
+        if self.can_capture(board, piece, new_col, new_row, old_col, old_row) == False:
+            self.reset_piece(piece, old_col, old_row)
+            return False
+        
+        
+        return True
     
-    def check_capture(self, board, piece, new_col, new_row, old_col, old_row):
+    def can_capture(self, board, piece, new_col, new_row, old_col, old_row):
         """
         Checks that the pieces only capture pieces of opposite color.
 
@@ -73,16 +79,22 @@ class Game:
         # Checks if the piece tries to capture its own color.
         if (board[new_col][new_row]
             and board[new_col][new_row].color == piece.color):
-                self.reset_piece(piece, old_col, old_row)
                 return False
         
         # Calls pawn capture logic if piece is a pawn.
         if isinstance(piece, Pawn):
-            return self.check_pawn_capture(board, piece, new_col, new_row, old_col, old_row)
-
+            return self.pawn_can_capture(board, new_col, new_row, old_col, old_row)
+        
+        try:
+            board[new_col][new_row].is_captured = True
+            board[new_col][new_row].check_capture()
+            print(board[new_col][new_row].is_captured)
+        except:
+            pass
+            
         return True
         
-    def check_pawn_capture(self, board, piece, new_col, new_row, old_col, old_row):
+    def pawn_can_capture(self, board, new_col, new_row, old_col, old_row):
         """
         Checks for pieces in front of moving pawns and checks for piece when pawn
         tries to capture.
@@ -100,17 +112,45 @@ class Game:
         """
         
         # Check if piece is in front of moving pawn, disallowing movement or capture.
-        if (board[new_row][new_col] and new_row == old_row):
-            self.reset_piece(piece, old_col, old_row)
+        if (board[new_col][new_row] and new_col == old_col):
             return False
         
         # Checks if pawn tries move to capture square but there is
         # no piece to capture, disallow capture or movement.
         elif not board[new_col][new_row] and new_col != old_col:
-            self.reset_piece(piece, old_col, old_row)
             return False
         
         return True
+    
+    def in_check(self, board):
+        for piece in Piece.instances:
+            if isinstance(piece, King) and piece.color == WHITE:
+                white_king = (piece.x, piece.y)
+            elif isinstance(piece, King) and piece.color == BLACK:
+                black_king = (piece.x, piece.y)
+        
+        for piece in Piece.instances:
+            pos = (piece.x, piece.y)
+            if piece.color == BLACK:
+                if (piece.move(white_king, (piece.x, piece.y)) == True
+                        and self.can_move(board, piece, pos) == True):
+                    piece.x = pos[0]
+                    piece.y = pos[1]
+                    print(piece)
+                    print("White king in check.")
+                    return False
+            if piece.color == WHITE:
+                if (piece.move(black_king, (piece.x, piece.y)) == True
+                        and self.can_move(board, piece, pos) == True):
+                    piece.x = pos[0]
+                    piece.y = pos[1]
+                    print(piece)
+                    print("Black king in check.")
+                    return False
+
+
+        
+        
         
     def reset_piece(self, piece, old_col, old_row):
         # Resets the piece position to the square before the move.
