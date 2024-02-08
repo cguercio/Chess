@@ -133,15 +133,6 @@ def main():
                             print("reset")
                             game.reset_game_state(Piece.game_state, Piece.instances)
                             board.update_board(Piece.instances)
-                            
-                            
-                                
-
-
-                    
-
-                
-        
 
 
 if __name__ == '__main__':
