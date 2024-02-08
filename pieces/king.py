@@ -9,7 +9,7 @@ class King(Piece):
         self.x = x
         self.y = y
         self.color = color
-        self.check = False
+        self.is_captured = False
 
         if self.color == BLACK:
             self.img = os.path.join(os.path.dirname(__file__),'..','graphics', 'b_king_png_shadow_100px.png')
@@ -41,10 +41,3 @@ class King(Piece):
     def move(self, new_position):
         self.x, self.y = new_position
         
-    def check_capture(self):
-        """
-        Checks if the piece has been captured and 
-        changes removes the piece from the piece list.
-        """
-        if self.is_captured:
-            pass

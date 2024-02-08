@@ -64,8 +64,7 @@ def main():
 
     screen.draw_pieces(board.board)
     
-    Piece.piece_list.append(Piece.instances)
-    board.board_list.append(board.board)
+    Piece.game_state = [(thing.x, thing.y, thing.color, thing.is_captured) for thing in Piece.instances]
     
     running = True
     while running:
@@ -103,6 +102,8 @@ def main():
                                 player_two.turn = True
                                 break
                         else:
+                            print("reset")
+                            game.reset_game_state(Piece.game_state, Piece.instances)
                             board.update_board(Piece.instances)
                             
         while player_two.turn:
@@ -129,15 +130,9 @@ def main():
                                 player_one.turn = True
                                 break
                         else:
+                            print("reset")
+                            game.reset_game_state(Piece.game_state, Piece.instances)
                             board.update_board(Piece.instances)
-                            
-                                
-
-
-                    
-
-                
-        
 
 
 if __name__ == '__main__':

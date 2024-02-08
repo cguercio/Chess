@@ -1,5 +1,6 @@
 from constants import *
 from utils import *
+from pieces import *
 
 class Board:
     board_list = []
@@ -59,14 +60,9 @@ class Board:
         self.board = [[[] for _ in range(self.x_squares)] for _ in range(self.y_squares)]
         
         for item in pieces:
-            self.board[item.x][item.y] = item
-        self.board_list.append(self.board)
+            if isinstance(item, King):
+                self.board[item.x][item.y] = item
+            elif item.is_captured == False:
+                self.board[item.x][item.y] = item
 
-        # old_col, old_row = original_position
-        # new_col, new_row = piece.x, piece.y
-        
-        # # Removes a piece from its original position.
-        # self.board[old_col][old_row] = []
-        
-        # # Places the piece at its new position.
-        # self.board[new_col][new_row] = piece
+

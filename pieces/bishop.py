@@ -38,11 +38,3 @@ class Bishop(Piece):
     
     def move(self, new_position):
         self.x, self.y = new_position
-        
-    def check_capture(self):
-        """
-        Checks if the piece has been captured and 
-        changes removes the piece from the piece list.
-        """
-        if self.is_captured:
-            Piece.instances.remove(self)
