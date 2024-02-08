@@ -15,7 +15,7 @@ class Bishop(Piece):
         elif self.color  == WHITE:
             self.img = os.path.join(os.path.dirname(__file__),'..','graphics', 'w_bishop_png_shadow_100px.png')
 
-    def move(self, new_position, original_position):
+    def valid_move(self, new_position, original_position):
         """
         Checks that the bishop moves only on diagonals.
 
@@ -34,10 +34,11 @@ class Bishop(Piece):
         if (abs(new_col - old_col) != abs(new_row - old_row)):
             return False
 
-        self.x = new_col
-        self.y = new_row
         return True
     
+    def move(self, new_position):
+        self.x, self.y = new_position
+        
     def check_capture(self):
         """
         Checks if the piece has been captured and 

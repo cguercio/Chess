@@ -16,7 +16,7 @@ class King(Piece):
         elif self.color  == WHITE:
             self.img = os.path.join(os.path.dirname(__file__),'..','graphics', 'w_king_png_shadow_100px.png')
 
-    def move(self, new_position, original_position):
+    def valid_move(self, new_position, original_position):
         """
         Checks that the king move is only one square in each direction.
 
@@ -36,10 +36,11 @@ class King(Piece):
         if (abs(new_col - old_col) > 1 or abs(new_row - old_row) > 1):
             return False
 
-        self.x = new_col
-        self.y = new_row
-        return True 
+        return True
     
+    def move(self, new_position):
+        self.x, self.y = new_position
+        
     def check_capture(self):
         """
         Checks if the piece has been captured and 

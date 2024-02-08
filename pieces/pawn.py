@@ -16,7 +16,7 @@ class Pawn(Piece):
         elif self.color == WHITE:
             self.img = os.path.join(os.path.dirname(__file__),'..','graphics', 'w_pawn_png_shadow_100px.png')
 
-    def move(self, new_position, original_position):
+    def valid_move(self, new_position, original_position):
         """
         Allows pawns to move only square forward unless it is on
         it's starting square in which case it can move two.
@@ -52,11 +52,10 @@ class Pawn(Piece):
         elif col_diff > 1 or row_diff > 1 or col_diff == 1 and row_diff != 1:
             return False
 
-        print("1")
-        # Update piece position and allow movement.
-        self.x = new_col
-        self.y = new_row
         return True
+    
+    def move(self, new_position):
+        self.x, self.y = new_position
     
     def check_capture(self):
         """
