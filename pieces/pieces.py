@@ -2,7 +2,7 @@
 
 class Piece:
     instances = []
-    piece_list = []
+    game_state = []
 
     def __init__(self, x, y, color):
         self.x = x

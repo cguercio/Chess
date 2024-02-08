@@ -39,7 +39,7 @@ def valid_move(piece, board, new_position, original_position, game, player):
     
     if  board[new_col][new_row] != []:
         board[new_col][new_row].is_captured = True
-        board[new_col][new_row].check_capture()
+
         
     board[old_col][old_row] = []
     board[new_col][new_row] = piece
@@ -52,27 +52,26 @@ def valid_move(piece, board, new_position, original_position, game, player):
             elif isinstance(item, King) and item.color == BLACK:
                 black_king = (col, row)
                 b_king = item
-
-    print(white_king)
-    print(black_king)
     
-    w_king.check = False
-    b_king.check = False
+    w_king.is_captured = False
+    b_king.is_captured = False
     
     game.in_check(board, white_king, black_king, w_king, b_king)
-    print(board)
-    
-    if w_king.check == True and player.color == WHITE:
+
+    if w_king.is_captured == True and player.color == WHITE:
         print("5")
         return False
-    elif b_king.check == True and player.color == BLACK:
+    elif b_king.is_captured == True and player.color == BLACK:
         print("6")
         return False
     
-    print("7")
-    
-    
-
     piece.move(new_position)
-    Piece.piece_list.append(Piece.instances)
+    
+    temp_list = []
+    for thing in Piece.instances:
+        state = (thing.x, thing.y, thing.color, thing.is_captured)
+        temp_list.append(state)
+        
+    Piece.game_state.append(temp_list)
+    print(Piece.game_state)
     return True

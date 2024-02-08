@@ -127,51 +127,22 @@ class Game:
                     if (piece.color == BLACK and piece.valid_move(white_king, original_position) == True
                         and self.piece_path(board, white_king, original_position) == True
                         and self.can_capture(board, white_king, original_position) == True):
-                        w_king.check = True
+                        w_king.is_captured = True
                         print("White in check.")
 
                     elif (piece.color == WHITE and piece.valid_move(black_king, original_position) == True
                         and self.piece_path(board, black_king, original_position) == True
                         and self.can_capture(board, black_king, original_position) == True):
-                        b_king.check = True
+                        b_king.is_captured = True
                         print("Black in check.")
 
             # Trying to move all white pieces to the black king.0
             
         
-    def update_capture(self, player):
-        """
-        Tries to sets the object's is_captured attribute to true.
-
-        Args:
-            board (list): Chess board represented as a 2D list.
-            new_col (int): New piece column
-            new_row (int): New piece row.
-        """
-        piece_locations = [(piece.x, piece.y) for piece in Piece.instances]
-
-        for index, item in enumerate(piece_locations):
-            if piece_locations.count(item) > 1:
-                if Piece.instances[index].color != player.color:
-                    Piece.instances[index].is_captured = True
-                    Piece.instances[index].check_capture()
-
-                    
-                
-            
-                    
-        # try:
-        #     board[new_col][new_row].is_captured = True
-        #     board[new_col][new_row].check_capture()
-        # except Exception:
-        #     pass
-    def get_last_game_state(self, piece_list, board_list):
-        
-        return piece_list[-1], board_list[-1]
-
-        
-
-
-
-        
-        
+    def reset_game_state(self, game_state, pieces):
+        for piece, attributes in zip(pieces, game_state[-1]):
+            x, y, color, is_captured = attributes
+            piece.x = x
+            piece.y = y
+            piece.color = color
+            piece.is_captured = is_captured
