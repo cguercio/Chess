@@ -16,7 +16,7 @@ class Queen(Piece):
         elif self.color  == WHITE:
             self.img = os.path.join(os.path.dirname(__file__),'..','graphics', 'w_queen_png_shadow_100px.png')
 
-    def move(self, new_position, original_position):
+    def valid_move(self, new_position, original_position):
         """
         Checks that the queen can only move along a diagonal
         or along a row or column.
@@ -37,7 +37,17 @@ class Queen(Piece):
             and (abs(new_col - old_col) != abs(new_row - old_row))):
             return False
 
-        self.x = new_col
-        self.y = new_row
         return True
+    
+    def move(self, new_position):
+        self.x, self.y = new_position
+    
+    def check_capture(self):
+        """
+        Checks if the piece has been captured and 
+        changes removes the piece from the piece list.
+        """
+
+        if self.is_captured == True:
+            Piece.instances.remove(self)
         

@@ -20,8 +20,8 @@ def main():
     qs_rook = Rook(0, 0, BLACK)
     qs_knight = Knight(1, 0, BLACK)
     qs_bishop = Bishop(2, 0, BLACK)
-    queen = Queen(3, 0, BLACK)
-    king = King(4, 0, BLACK)
+    b_queen = Queen(3, 0, BLACK)
+    b_king = King(4, 0, BLACK)
     ks_bishop = Bishop(5, 0, BLACK)
     ks_knight = Knight(6, 0, BLACK)
     ks_rook = Rook(7, 0, BLACK)
@@ -38,8 +38,8 @@ def main():
     qs_rook = Rook(0, 7, WHITE)
     qs_knight = Knight(1, 7, WHITE)
     qs_bishop = Bishop(2, 7, WHITE)
-    queen = Queen(3, 7, WHITE)
-    king = King(4, 7, WHITE)
+    w_queen = Queen(3, 7, WHITE)
+    w_king = King(4, 7, WHITE)
     ks_bishop = Bishop(5, 7, WHITE)
     ks_knight = Knight(6, 7, WHITE)
     ks_rook = Rook(7, 7, WHITE)
@@ -53,7 +53,9 @@ def main():
     wpawn8 = Pawn(7, 6, WHITE)
 
     # Initiating player objects
-    player_one = Player()
+    player_one = Player(True, WHITE)
+    player_two = Player(False, BLACK)
+    
     game = Game()
 
     # Placing the pieces on the board
@@ -61,6 +63,9 @@ def main():
         board.place_piece(item)
 
     screen.draw_pieces(board.board)
+    
+    Piece.piece_list.append(Piece.instances)
+    board.board_list.append(board.board)
     
     running = True
     while running:
@@ -73,18 +78,60 @@ def main():
                 break
         
             
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_pos = pygame.mouse.get_pos()
-                state, piece, original_position = player_one.move(mouse_pos, board.board)
-                if state == True:
-                    wait()
-                    mouse_pos2 = pygame.mouse.get_pos()
-                    new_position = mouse_pos_to_board_pos(mouse_pos2, board.board)
-                    if (piece.move(new_position, original_position) == True
-                        and game.check_move(board.board, piece, original_position) == True):
-                            board.update_piece(piece, original_position)
-                            screen.draw_squares(square_list, WHITE, GREEN)
-                            screen.draw_pieces(board.board)
+            
+        while player_one.turn:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    player_one.turn = False
+                    player_two.turn = False
+                    running = False
+                    break
+            
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = pygame.mouse.get_pos()
+                    state, piece, original_position = player_one.move(mouse_pos, board.board)
+                    if state == True and piece.color == WHITE:
+                        wait()
+                        mouse_pos2 = pygame.mouse.get_pos()
+                        new_position = mouse_pos_to_board_pos(mouse_pos2, board.board)
+                        if valid_move(piece, board.board, new_position, original_position, game, player_one) == True:
+                                board.update_board(Piece.instances)
+                                screen.draw_squares(square_list, WHITE, GREEN)
+                                screen.draw_pieces(board.board)
+                                #game.in_check(board.board, w_king, b_king)
+                                player_one.turn = False
+                                player_two.turn = True
+                                break
+                        else:
+                            board.update_board(Piece.instances)
+                            
+        while player_two.turn:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    player_one.turn = False
+                    player_two.turn = False
+                    running = False
+                    break
+            
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = pygame.mouse.get_pos()
+                    state, piece, original_position = player_two.move(mouse_pos, board.board)
+                    if state == True and piece.color == BLACK:
+                        wait()
+                        mouse_pos2 = pygame.mouse.get_pos()
+                        new_position = mouse_pos_to_board_pos(mouse_pos2, board.board)
+                        if valid_move(piece, board.board, new_position, original_position, game, player_two) == True:
+                                board.update_board(Piece.instances)
+                                screen.draw_squares(square_list, WHITE, GREEN)
+                                screen.draw_pieces(board.board)
+                                #game.in_check(board.board, w_king, b_king)
+                                player_two.turn = False
+                                player_one.turn = True
+                                break
+                        else:
+                            board.update_board(Piece.instances)
+                            
+                                
 
 
                     

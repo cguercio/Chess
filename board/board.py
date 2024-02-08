@@ -2,6 +2,7 @@ from constants import *
 from utils import *
 
 class Board:
+    board_list = []
 
     def __init__(self, x_squares, y_squares):
         self.x_squares = x_squares
@@ -43,7 +44,7 @@ class Board:
         # Places the piece on the board.
         self.board[col][row] = piece
 
-    def update_piece(self, piece, original_position):
+    def update_board(self, pieces):
         """
         Updates the position of a piece on the board.
 
@@ -54,12 +55,18 @@ class Board:
         Returns:
             None
         """
-        old_col, old_row = original_position
-        new_col, new_row = piece.x, piece.y
-        
-        # Removes a piece from its original position.
-        self.board[old_col][old_row] = []
-        
-        # Places the piece at its new position.
-        self.board[new_col][new_row] = piece
 
+        self.board = [[[] for _ in range(self.x_squares)] for _ in range(self.y_squares)]
+        
+        for item in pieces:
+            self.board[item.x][item.y] = item
+        self.board_list.append(self.board)
+
+        # old_col, old_row = original_position
+        # new_col, new_row = piece.x, piece.y
+        
+        # # Removes a piece from its original position.
+        # self.board[old_col][old_row] = []
+        
+        # # Places the piece at its new position.
+        # self.board[new_col][new_row] = piece

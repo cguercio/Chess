@@ -10,13 +10,13 @@ class Pawn(Piece):
         self.y = y
         self.color = color
         self.starting_pos = (x, y)
-
+                
         if self.color == BLACK:
             self.img = os.path.join(os.path.dirname(__file__),'..','graphics', 'b_pawn_png_shadow_100px.png')
         elif self.color == WHITE:
             self.img = os.path.join(os.path.dirname(__file__),'..','graphics', 'w_pawn_png_shadow_100px.png')
 
-    def move(self, new_position, original_position):
+    def valid_move(self, new_position, original_position):
         """
         Allows pawns to move only square forward unless it is on
         it's starting square in which case it can move two.
@@ -49,10 +49,18 @@ class Pawn(Piece):
             if self.color == BLACK and new_row - old_row < 0:
                 return False
         # Check if the pawn is moving more than 1 diagonally.
-        elif col_diff == 1 and row_diff != 1:
+        elif col_diff > 1 or row_diff > 1 or col_diff == 1 and row_diff != 1:
             return False
 
-        # Update piece position and allow movement.
-        self.x = new_col
-        self.y = new_row
         return True
+    
+    def move(self, new_position):
+        self.x, self.y = new_position
+    
+    def check_capture(self):
+        """
+        Checks if the piece has been captured and 
+        changes removes the piece from the piece list.
+        """
+        if self.is_captured:
+            Piece.instances.remove(self)

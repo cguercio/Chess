@@ -15,7 +15,7 @@ class Knight(Piece):
         elif self.color  == WHITE:
             self.img = os.path.join(os.path.dirname(__file__),'..','graphics', 'w_knight_png_shadow_100px.png')
 
-    def move(self, new_position, original_position):
+    def valid_move(self, new_position, original_position):
         """
         Checks that the knight moves either two squares in one
         direction and one in the other.
@@ -36,10 +36,19 @@ class Knight(Piece):
         # Checks that the knight moves either two squares in one
         # direction and one in the other.
         if (col_diff == 2 and row_diff == 1) or (col_diff == 1 and row_diff == 2):
-            self.x = new_col
-            self.y = new_row
             return True
-        
+
         return False
+    
+    def move(self, new_position):
+        self.x, self.y = new_position
+        
+    def check_capture(self):
+        """
+        Checks if the piece has been captured and 
+        changes removes the piece from the piece list.
+        """
+        if self.is_captured:
+            Piece.instances.remove(self)
             
         

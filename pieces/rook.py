@@ -17,7 +17,7 @@ class Rook(Piece):
             self.img = os.path.join(os.path.dirname(__file__),'..','graphics',
                                                 'w_rook_png_shadow_100px.png')
 
-    def move(self, new_position, original_position):
+    def valid_move(self, new_position, original_position):
         """
         Checks that the rook only moves along a row or column.
 
@@ -36,6 +36,15 @@ class Rook(Piece):
         if (new_col - old_col != 0 and new_row - old_row != 0):
             return False
 
-        self.x = new_col
-        self.y = new_row
         return True
+    
+    def move(self, new_position):
+        self.x, self.y = new_position
+    
+    def check_capture(self):
+        """
+        Checks if the piece has been captured and 
+        changes removes the piece from the piece list.
+        """
+        if self.is_captured:
+            Piece.instances.remove(self)
