@@ -48,9 +48,15 @@ class Pawn(Piece):
                 return False
             if self.color == BLACK and new_row - old_row < 0:
                 return False
-        # Check if the pawn is moving more than 1 diagonally.
-        elif col_diff > 1 or row_diff > 1 or col_diff == 1 and row_diff != 1:
-            return False
+        else:
+            # Check if the pawn is moving more than 1 diagonally.
+            if col_diff > 1 or row_diff > 1 or col_diff == 1 and row_diff != 1:
+                return False
+            # check if the pawn trying to capture backwards.
+            if self.color == WHITE and new_row - old_row > 0:
+                return False
+            if self.color == BLACK and new_row - old_row < 0:
+                return False
 
         return True
     

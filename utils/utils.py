@@ -41,13 +41,13 @@ def valid_move(piece, board, new_position, original_position, game, player):
     # Runs different checks for valid moves.
     if piece.valid_move(new_position, original_position) == False:
         print("2")
-        return False
+        return False, board
     if game.piece_path(board, new_position, original_position) == False:
         print("3")
-        return False
+        return False, board
     if game.can_capture(board, new_position, original_position) == False:
         print("4")
-        return False
+        return False, board
     
     # Updates the is_captured attribute if there is a piece on the new square.
     if  board[new_col][new_row] != []:
@@ -77,9 +77,9 @@ def valid_move(piece, board, new_position, original_position, game, player):
 
     # Checks if the player tries to make a move, but their king is still in check.
     if w_king.is_captured == True and player.color == WHITE:
-        return False
+        return False, board
     elif b_king.is_captured == True and player.color == BLACK:
-        return False
+        return False, board
     
     # Moves the piece to its new location.
     piece.move(new_position)
@@ -94,4 +94,4 @@ def valid_move(piece, board, new_position, original_position, game, player):
     # Appends the list of attributes to the game_state list.
     Piece.game_state.append(temp_list)
 
-    return True
+    return True, board

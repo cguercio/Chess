@@ -62,3 +62,27 @@ class Screen:
                     self.win.blit(img, (x_pos, y_pos))
 
         pygame.display.update()
+
+    def update_move(self, board, piece, original_position, color1, color2):
+        # Gets the size of the board in x and y.
+        num_cols = len(board[0])
+        num_rows = len(board)
+        square_width = self.width // num_cols
+        square_height = self.height // num_rows
+        col, row = original_position
+
+        fill_color = color1 if (col + row) % 2 == 0 else color2
+        self.win.fill(fill_color, (col * 100, row * 100,
+                                            square_width, square_height))
+        
+        fill_color = color1 if (piece.x + piece.y) % 2 == 0 else color2
+        self.win.fill(fill_color, (piece.x * square_width, piece.y * square_height,
+                                            square_width, square_height))
+
+        img = pygame.image.load(piece.img)
+        img_offset_x = (WIDTH // num_cols - img.get_width()) // 2 + 2
+        img_offset_y = (HEIGHT // num_rows - img.get_height()) // 2 + 2
+        x_pos = piece.x * WIDTH // num_cols + img_offset_x
+        y_pos = piece.y * HEIGHT // num_rows + img_offset_y
+        self.win.blit(img, (x_pos, y_pos))
+        pygame.display.update()
