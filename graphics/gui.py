@@ -63,22 +63,40 @@ class Screen:
 
         pygame.display.update()
 
-    def update_move(self, board, piece, original_position, color1, color2):
+    def update_move(self, board, piece, original_position):
+        """
+        Clears the starting square, clears the new square,
+        displays the piece on the new square.
+
+        Args:
+            board (list): Chessboard as a 2D list.
+            piece (object): Piece being moved.
+            original_position (tuple): Original position of the piece.
+        """
+        
+        
         # Gets the size of the board in x and y.
         num_cols = len(board[0])
         num_rows = len(board)
+
+        # Getting the height and width of the squares
         square_width = self.width // num_cols
         square_height = self.height // num_rows
-        col, row = original_position
 
-        fill_color = color1 if (col + row) % 2 == 0 else color2
+        col, row = original_position    
+
+        # Color the piece original square with the correct color.
+        fill_color = WHITE if (col + row) % 2 == 0 else GREEN
         self.win.fill(fill_color, (col * 100, row * 100,
                                             square_width, square_height))
         
-        fill_color = color1 if (piece.x + piece.y) % 2 == 0 else color2
+        # Color the new square with the correct color. 
+        # This clears the square of any pieces that are on that square.
+        fill_color = WHITE if (piece.x + piece.y) % 2 == 0 else GREEN
         self.win.fill(fill_color, (piece.x * square_width, piece.y * square_height,
                                             square_width, square_height))
 
+        # Loads and displays the image of the piece at it's new location.
         img = pygame.image.load(piece.img)
         img_offset_x = (WIDTH // num_cols - img.get_width()) // 2 + 2
         img_offset_y = (HEIGHT // num_rows - img.get_height()) // 2 + 2

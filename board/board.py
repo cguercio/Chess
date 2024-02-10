@@ -44,25 +44,3 @@ class Board:
         col, row = piece.x, piece.y
         # Places the piece on the board.
         self.board[col][row] = piece
-
-    def update_board(self, pieces):
-        """
-        Updates the position of a piece on the board.
-
-        Args:
-            piece: The piece to be updated.
-            original_position: The original position of the piece.
-
-        Returns:
-            None
-        """
-
-        self.board = [[[] for _ in range(self.x_squares)] for _ in range(self.y_squares)]
-        
-        for item in pieces:
-            if isinstance(item, King):
-                self.board[item.x][item.y] = item
-            elif item.is_captured == False:
-                self.board[item.x][item.y] = item
-
-
