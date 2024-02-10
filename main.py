@@ -69,6 +69,8 @@ def main():
     # Draws the pieces at their starting squares.
     screen.draw_pieces(board.board)
 
+
+    starting_board_save = starting_board.board
     move_list = []
     
     running = True
@@ -81,7 +83,8 @@ def main():
                 running = False
                 break
 
-
+        stop = 0
+        starting_board.board = starting_board_save
         while player_one.turn:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -89,11 +92,10 @@ def main():
                     player_two.turn = False
                     running = False
                     break
-                current_board = copy.copy(board.board)
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_LEFT:
-                        print('left')
-                        board_history(screen, current_board, move_list, square_list, WHITE, GREEN)
+                        stop += 1
+                        board_history(screen, starting_board.board, move_list, square_list, stop, WHITE, GREEN)
             
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
@@ -114,7 +116,8 @@ def main():
                         else:
                             print("Reset White")
 
-                            
+        stop = 0
+        starting_board.board = starting_board_save
         while player_two.turn:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -122,11 +125,10 @@ def main():
                     player_two.turn = False
                     running = False
                     break
-                current_board = copy.copy(board.board)
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_LEFT:
-                        print('left')
-                        board_history(screen, current_board, move_list, square_list, WHITE, GREEN)
+                        stop += 1
+                        board_history(screen, starting_board.board, move_list, square_list, stop, WHITE, GREEN)
             
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()

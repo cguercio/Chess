@@ -95,20 +95,18 @@ def valid_move(piece, board, new_position, original_position, game, player):
 
 
 
-def board_history(screen, board, move_list, point_list, color1, color2):
-            
-         
-            for move in move_list[::-1]:
+def board_history(screen, board, move_list, point_list, stop,  color1, color2):
+            print(stop)
+            for move in move_list[0:len(move_list) - stop:1]:
                 item = move[0]
                 new_col, new_row = move[1]
                 old_col, old_row = move[2]
 
                 board[old_col][old_row] = []
                 board[new_col][new_row] = item
-            
-            print(board)
+
             screen.draw_squares(point_list, color1, color2)
-            
+
             num_cols = len(board[0])
             num_rows = len(board)
 
