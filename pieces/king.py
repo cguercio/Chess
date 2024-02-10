@@ -9,7 +9,7 @@ class King(Piece):
         self.x = x
         self.y = y
         self.color = color
-        self.is_captured = False
+        self.in_check = False
 
         if self.color == BLACK:
             self.img = os.path.join(os.path.dirname(__file__),'..','graphics', 'b_king_png_shadow_100px.png')

@@ -118,8 +118,8 @@ class Game:
             b_king (object): Black king.
         """
 
-        w_king.is_captured = False
-        b_king.is_captured = False
+        w_king.in_check = False
+        b_king.in_check = False
         
         # Looping thought piece objects.
         for col, rank in enumerate(board):
@@ -130,27 +130,12 @@ class Game:
                     if (piece.color == BLACK and piece.valid_move(white_king, original_position) == True
                         and self.piece_path(board, white_king, original_position) == True
                         and self.can_capture(board, white_king, original_position) == True):
-                        w_king.is_captured = True
+                        print("white in check")
+                        w_king.in_check = True
 
                     # Trying to move all white pieces to the black king.
                     elif (piece.color == WHITE and piece.valid_move(black_king, original_position) == True
                         and self.piece_path(board, black_king, original_position) == True
                         and self.can_capture(board, black_king, original_position) == True):
-                        b_king.is_captured = True
-
-        
-    def reset_game_state(self, game_state, pieces):
-        """
-        Resets the game state to the previous move.
-
-        Args:
-            game_state (list): List of attributes for previous game states.
-            pieces (list): List of piece objects.
-        """
-        # Sets piece attributes to the previous move.
-        for piece, attributes in zip(pieces, game_state[-1]):
-            x, y, color, is_captured = attributes
-            piece.x = x
-            piece.y = y
-            piece.color = color
-            piece.is_captured = is_captured
+                        b_king.in_check = True
+                        print("black in check")

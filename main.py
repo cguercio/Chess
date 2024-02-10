@@ -6,6 +6,8 @@ from player import *
 from utils import *
 from game import *
 import math
+import pygame
+import copy
 
 def main():
     clock = pygame.time.Clock()
@@ -13,6 +15,7 @@ def main():
     # Initiating the board and drawing squares
     screen = Screen(WIDTH, HEIGHT)
     board = Board(8, 8)
+    starting_board = Board(8, 8)
     square_list = board.squares()
     screen.draw_squares(square_list, WHITE, GREEN)
 
@@ -55,16 +58,20 @@ def main():
     # Initiating player objects
     player_one = Player(True, WHITE)
     player_two = Player(False, BLACK)
-    
+    # Initiating the game object.
     game = Game()
 
-    # Placing the pieces on the board
+    # Placing the pieces on the board.
     for item in Piece.instances:
         board.place_piece(item)
+        starting_board.place_piece(item)
 
+    # Draws the pieces at their starting squares.
     screen.draw_pieces(board.board)
-    
-    Piece.game_state = [(thing.x, thing.y, thing.color, thing.is_captured) for thing in Piece.instances]
+
+
+    starting_board_save = starting_board.board
+    move_list = []
     
     running = True
     while running:
@@ -75,16 +82,26 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
                 break
-        
-            
-            
+
+        stop = 0
         while player_one.turn:
+
+            display_board = copy.copy(board.board)
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     player_one.turn = False
                     player_two.turn = False
                     running = False
                     break
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_LEFT:
+                        stop -= 1
+                        board_history(screen, display_board, move_list, square_list, stop, WHITE, GREEN)
+                    if event.key == pygame.K_RIGHT:
+                        stop += 1
+                        board_history(screen, display_board, move_list, square_list, stop, WHITE, GREEN)
+            
             
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
@@ -93,26 +110,37 @@ def main():
                         wait()
                         mouse_pos2 = pygame.mouse.get_pos()
                         new_position = mouse_pos_to_board_pos(mouse_pos2, board.board)
-                        if valid_move(piece, board.board, new_position, original_position, game, player_one) == True:
-                                board.update_board(Piece.instances)
-                                screen.draw_squares(square_list, WHITE, GREEN)
-                                screen.draw_pieces(board.board)
-                                #game.in_check(board.board, w_king, b_king)
-                                player_one.turn = False
-                                player_two.turn = True
-                                break
+                        temp_board = copy.copy(board.board)
+                        old_piece = board.board[new_position[0]][new_position[1]]
+                        result, next_board = valid_move(piece, temp_board, new_position, original_position, game, player_one)
+                        if result == True:
+                            board.board = next_board
+                            screen.update_move(board.board, piece, original_position)
+                            move_list.append((piece, new_position, original_position, old_piece))
+                            player_one.turn = False
+                            player_two.turn = True
+                            break
                         else:
-                            print("reset")
-                            game.reset_game_state(Piece.game_state, Piece.instances)
-                            board.update_board(Piece.instances)
-                            
+                            print("Reset White")
+
+        stop = 0
         while player_two.turn:
+
+            display_board = copy.copy(board.board)
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     player_one.turn = False
                     player_two.turn = False
                     running = False
                     break
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_LEFT:
+                        stop -= 1
+                        board_history(screen, display_board, move_list, square_list, stop, WHITE, GREEN)
+                    if event.key == pygame.K_RIGHT:
+                        stop += 1
+                        board_history(screen, display_board, move_list, square_list, stop, WHITE, GREEN)
             
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
@@ -121,19 +149,18 @@ def main():
                         wait()
                         mouse_pos2 = pygame.mouse.get_pos()
                         new_position = mouse_pos_to_board_pos(mouse_pos2, board.board)
-                        if valid_move(piece, board.board, new_position, original_position, game, player_two) == True:
-                                board.update_board(Piece.instances)
-                                screen.draw_squares(square_list, WHITE, GREEN)
-                                screen.draw_pieces(board.board)
-                                #game.in_check(board.board, w_king, b_king)
+                        temp_board = copy.copy(board.board)
+                        old_piece = board.board[new_position[0]][new_position[1]]
+                        result, next_board = valid_move(piece, temp_board, new_position, original_position, game, player_two)
+                        if result == True:
+                                board.board = next_board
+                                screen.update_move(board.board, piece, original_position)
+                                move_list.append((piece, new_position, original_position, old_piece))
                                 player_two.turn = False
                                 player_one.turn = True
                                 break
                         else:
-                            print("reset")
-                            game.reset_game_state(Piece.game_state, Piece.instances)
-                            board.update_board(Piece.instances)
-
-
+                            print("Reset Black")
+        print(move_list)
 if __name__ == '__main__':
     main()
