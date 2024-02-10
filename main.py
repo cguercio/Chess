@@ -84,8 +84,10 @@ def main():
                 break
 
         stop = 0
-        starting_board.board = starting_board_save
         while player_one.turn:
+
+            display_board = copy.copy(board.board)
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     player_one.turn = False
@@ -94,8 +96,12 @@ def main():
                     break
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_LEFT:
+                        stop -= 1
+                        board_history(screen, display_board, move_list, square_list, stop, WHITE, GREEN)
+                    if event.key == pygame.K_RIGHT:
                         stop += 1
-                        board_history(screen, starting_board.board, move_list, square_list, stop, WHITE, GREEN)
+                        board_history(screen, display_board, move_list, square_list, stop, WHITE, GREEN)
+            
             
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
@@ -105,11 +111,12 @@ def main():
                         mouse_pos2 = pygame.mouse.get_pos()
                         new_position = mouse_pos_to_board_pos(mouse_pos2, board.board)
                         temp_board = copy.copy(board.board)
+                        old_piece = board.board[new_position[0]][new_position[1]]
                         result, next_board = valid_move(piece, temp_board, new_position, original_position, game, player_one)
                         if result == True:
                             board.board = next_board
                             screen.update_move(board.board, piece, original_position)
-                            move_list.append((piece, new_position, original_position))
+                            move_list.append((piece, new_position, original_position, old_piece))
                             player_one.turn = False
                             player_two.turn = True
                             break
@@ -117,8 +124,10 @@ def main():
                             print("Reset White")
 
         stop = 0
-        starting_board.board = starting_board_save
         while player_two.turn:
+
+            display_board = copy.copy(board.board)
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     player_one.turn = False
@@ -127,8 +136,11 @@ def main():
                     break
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_LEFT:
+                        stop -= 1
+                        board_history(screen, display_board, move_list, square_list, stop, WHITE, GREEN)
+                    if event.key == pygame.K_RIGHT:
                         stop += 1
-                        board_history(screen, starting_board.board, move_list, square_list, stop, WHITE, GREEN)
+                        board_history(screen, display_board, move_list, square_list, stop, WHITE, GREEN)
             
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
@@ -138,11 +150,12 @@ def main():
                         mouse_pos2 = pygame.mouse.get_pos()
                         new_position = mouse_pos_to_board_pos(mouse_pos2, board.board)
                         temp_board = copy.copy(board.board)
+                        old_piece = board.board[new_position[0]][new_position[1]]
                         result, next_board = valid_move(piece, temp_board, new_position, original_position, game, player_two)
                         if result == True:
                                 board.board = next_board
                                 screen.update_move(board.board, piece, original_position)
-                                move_list.append((piece, new_position, original_position))
+                                move_list.append((piece, new_position, original_position, old_piece))
                                 player_two.turn = False
                                 player_one.turn = True
                                 break
