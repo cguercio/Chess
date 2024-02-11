@@ -55,9 +55,8 @@ def valid_move(piece, board, new_position, original_position, game, player, scre
     if game.piece_path(board, new_position, original_position) == False:
         return False, board
     if isinstance(piece, King) and piece.castling == True:
-        game.castling(screen, piece, board, new_position, original_position)
-        piece.move(new_position)
-        return True, board
+        can_castle = game.castling(screen, game, piece, board, new_position, original_position)
+        return can_castle, board
     if game.can_capture(board, new_position, original_position) == False:
         return False, board
 

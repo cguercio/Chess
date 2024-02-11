@@ -141,18 +141,81 @@ class Game:
                         b_king.in_check = True
                         print("black in check")
 
-    def castling(self, screen, piece, board, new_position, original_position):
+    def castling(self, screen, game, piece, board, new_position, original_position):
 
+        # Unpacking the move positions.
         old_col, old_row = original_position
         new_col, new_row = new_position
 
+        # Finding the king locations.
+        for col, rank in enumerate(board):
+            for row, item in enumerate(rank):
+                if isinstance(item, King) and item.color == WHITE:
+                    white_king = (col, row)
+                    w_king = item
+                elif isinstance(item, King) and item.color == BLACK:
+                    black_king = (col, row)
+                    b_king = item
+
+        # Check if the king is currently in check.
+        game.in_check(board, white_king, black_king, w_king, b_king)
+
+        # If king is in check when castling, disallow castling and reset attributes
+        if piece.in_check == True:
+            piece.in_check = False
+            piece.castling = False
+            return False
+
+        # If castling in positive x.
         if new_col - old_col > 0:
+
+            # Update the board to move the king one square in positive x.
+            # Checking that the king cannot castle through check.
+            board[old_col][old_row] = []
+            board[old_col + 1][old_row] = piece
+            white_king = (old_col + 1, old_row)
             
+            
+            # Checking if the king is in check.
+            game.in_check(board, white_king, black_king, w_king, b_king)
+
+            # If the king is in check, reset the board and king attributes.
+            if piece.in_check == True:
+                board = self.reset_castling(piece, board, new_col, new_row, old_col, old_row)
+                return False
+
+            # Update the board to move the king two squares in positive x.
+            board[old_col + 1][old_row] = []
+            board[old_col + 2][old_row] = piece
+            white_king = (old_col + 2, old_row)
+
+            # Checking if the king is in check.
+            game.in_check(board, white_king, black_king, w_king, b_king)
+
+            # If the king is in check, reset the board and king attributes.
+            if piece.in_check == True:
+                board = self.reset_castling(piece, board, new_col, new_row, old_col, old_row)
+                return False
+
+            # Update the board with rook move if castling is allowed.
             right_rook = board[old_col + 3][old_row]
+            board[old_col + 3][old_row] = []
+            board[old_col + 1][old_row] = right_rook
+
+            # Update the pieces attributes
+            piece.move(new_position)
             right_rook.move((old_col + 1, old_row))
 
-            board[old_col + 1][old_row] = right_rook
-            board[old_col + 3][old_row] = []
-            board[new_col][new_row] = piece
-
+            # Draw the rook move on the screen. 
             screen.update_move(board, right_rook, (old_col + 3, old_row))
+        return True
+
+    def reset_castling(self, piece, board, new_col, new_row, old_col, old_row):
+        piece.in_check = False
+        piece.castling = False
+        board[old_col][old_row] = piece
+        board[new_col][new_row] = []
+        board[old_col + 1][old_row] = []
+        board[old_col + 2][old_row] = []
+
+        return board

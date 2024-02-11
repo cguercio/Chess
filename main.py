@@ -203,6 +203,6 @@ def main():
                                 break
                         else:
                             print("Reset Black")
-        print(move_list)
+
 if __name__ == '__main__':
     main()
