@@ -69,39 +69,60 @@ def main():
     # Draws the pieces at their starting squares.
     screen.draw_pieces(board.board)
 
-
-    starting_board_save = starting_board.board
     move_list = []
+    index = 0
     
     running = True
     while running:
+
         clock.tick(FPS)
 
-
+        # Quit pygame if escape is clicked.
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
                 break
 
-        stop = 0
+        # Player one move loop.        
         while player_one.turn:
-
-            display_board = copy.copy(board.board)
-
             for event in pygame.event.get():
+                # Quit pygame if escape is clicked.
                 if event.type == pygame.QUIT:
                     player_one.turn = False
                     player_two.turn = False
                     running = False
                     break
+
+                # Detect if user presses a keydown.
                 if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_DOWN:
+                        index = len(move_list) # It is important that this index is before the function
+                        if board_navigation(screen, board.board, move_list, index, event.key) == False:
+                            index = len(move_list)
+                        else:
+                            pass
+
+                    # Calls board navigation if user presses left.
                     if event.key == pygame.K_LEFT:
-                        stop -= 1
-                        board_history(screen, display_board, move_list, square_list, stop, WHITE, GREEN)
+                        index += 1 # It is important that this index is before the function
+                        if board_navigation(screen, board.board, move_list, index, event.key) == False:
+                            index = len(move_list)
+                        else:
+                            pass
+                    
+                    # Calls board navigation if user presses right.
                     if event.key == pygame.K_RIGHT:
-                        stop += 1
-                        board_history(screen, display_board, move_list, square_list, stop, WHITE, GREEN)
-            
+                        if board_navigation(screen, board.board, move_list, index, event.key) == False:
+                            index = 0
+                        else:
+                            index -= 1
+
+                    # Displays the current board and escapes from board navigation.
+                    if event.key == pygame.K_ESCAPE or event.key == pygame.K_UP:
+                        screen.draw_squares(square_list, WHITE, GREEN)
+                        screen.draw_pieces(board.board)
+                        index = 0
+
             
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
@@ -123,24 +144,45 @@ def main():
                         else:
                             print("Reset White")
 
-        stop = 0
         while player_two.turn:
 
-            display_board = copy.copy(board.board)
-
             for event in pygame.event.get():
+            # Quit pygame if escape is clicked.
                 if event.type == pygame.QUIT:
                     player_one.turn = False
                     player_two.turn = False
                     running = False
                     break
+
                 if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_DOWN:
+                        index = len(move_list) # It is important that this index is before the function
+                        if board_navigation(screen, board.board, move_list, index, event.key) == False:
+                            index = len(move_list)
+                        else:
+                            pass
+                        
+                # Calls board navigation if user presses left.
                     if event.key == pygame.K_LEFT:
-                        stop -= 1
-                        board_history(screen, display_board, move_list, square_list, stop, WHITE, GREEN)
+                        index += 1 # It is important that this index is before the function
+                        if board_navigation(screen, board.board, move_list, index, event.key) == False:
+                            index = len(move_list)
+                        else:
+                            pass
+                    
+                    # Calls board navigation if user presses right.
                     if event.key == pygame.K_RIGHT:
-                        stop += 1
-                        board_history(screen, display_board, move_list, square_list, stop, WHITE, GREEN)
+                        if board_navigation(screen, board.board, move_list, index, event.key) == False:
+                            index = 0
+                        else:
+                            index -= 1
+                    
+                    # Displays the current board and escapes from board navigation
+                    if event.key == pygame.K_ESCAPE or event.key == pygame.K_UP:
+                        screen.draw_squares(square_list, WHITE, GREEN)
+                        screen.draw_pieces(board.board)
+                        index = 0
+            
             
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()

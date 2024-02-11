@@ -95,39 +95,70 @@ def valid_move(piece, board, new_position, original_position, game, player):
 
 
 
-def board_history(screen, board, move_list, point_list, stop,  color1, color2):
+def board_navigation(screen, board, move_list, index, key):
+    """
+    Cycles through the move list forwards or backwards.
 
-            for move in move_list[-1:stop - 1:-1]:
-                item = move[0]
-                old_col, old_row = move[1]
-                new_col, new_row = move[2]
-                old_piece = move[3]
+    Args:
+        screen (object): Screen object.
+        board (list): Chessboard as a 2D list.
+        move_list (list): List of tuples containing previous move info.
+        index (int): Index for iterating over move list.
+        key (key): Pygame key press.
 
-                board[old_col][old_row] = old_piece
-                board[new_col][new_row] = item
-                
-            screen.draw_squares(point_list, color1, color2)
+    Returns:
+        boolean: Returns false if index is at the start or end of the list.
+    """
+    
+    # If use presses the down arrow go to the start of the move list.
+    if key == pygame.K_DOWN:
+        for move in move_list[::-1]:
+            piece = move[0]
+            old_col, old_row = move[1]
+            new_col, new_row = move[2]
+            old_piece = move[3]
 
-            num_cols = len(board[0])
-            num_rows = len(board)
+            screen.draw_board_navigation(board, piece, new_col, new_row, old_col, old_row, old_piece)
 
-            # Loops through the board, finds the pieces, centers and displays the pieces
-            for col, rank in enumerate(board):
-                for row, piece in enumerate(rank):
-                    if isinstance(piece, Piece):
-                        img = pygame.image.load(piece.img)
-                        img_offset_x = (WIDTH // num_cols - img.get_width()) // 2 + 2
-                        img_offset_y = (HEIGHT // num_rows - img.get_height()) // 2 + 2
-                        x_pos = col * WIDTH // num_cols + img_offset_x
-                        y_pos = row * HEIGHT // num_rows + img_offset_y
-                        screen.win.blit(img, (x_pos, y_pos))
-            pygame.display.update()
+    # If key is left arrow, visually undo the moves.
+    if key == pygame.K_LEFT:
 
+        # If we are at the start of the list, return false.
+        if len(move_list) - index < 0:
+            return False
 
-        # for event in pygame.event.get():
-        #     if event.key == pygame.K_LEFT:
-        #         if event.type == pygame.K_ESCAPE:
-        #             board_state = False
+        else:
+            # Finding the move to undo by slicing the move list with index.
+            move = move_list[len(move_list) - index]
 
+            # Extracting the info needed from move list tuple.
+            piece = move[0]
+            old_col, old_row = move[1]
+            new_col, new_row = move[2]
+            old_piece = move[3]
 
+            # Drawing the updated move on the screen.
+            screen.draw_board_navigation(board, piece, new_col, new_row, old_col, old_row, old_piece)
+            
+    # If key is right arrow, visually redo the moves.
+    if key == pygame.K_RIGHT:
 
+        # If we are at the end of the list, return false.
+        if index == 0:
+            return False
+        else:
+            # Finding the move to undo by slicing the move list with index.
+            move = move_list[len(move_list) - index]
+
+            # Extracting the info needed from move list tuple.
+            piece = move[0]
+            new_col, new_row = move[1]
+            old_col, old_row = move[2]
+            old_piece =[]
+
+            # It is important that this index is after the function
+            index -= 1
+
+            # Drawing the updated move on the screen.
+            screen.draw_board_navigation(board, piece, new_col, new_row, old_col, old_row, old_piece)
+            
