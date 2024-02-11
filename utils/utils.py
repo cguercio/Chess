@@ -47,6 +47,7 @@ def valid_move(piece, board, new_position, original_position, game, player):
     # Unpacks the original and new piece positions.
     old_col, old_row = original_position
     new_col, new_row = new_position
+    old_piece = board[new_col][new_row]
     
     # Runs different checks for valid moves.
     if piece.valid_move(new_position, original_position) == False:
@@ -81,11 +82,16 @@ def valid_move(piece, board, new_position, original_position, game, player):
         board[old_col][old_row] = piece
         board[new_col][new_row] = []
         b_king.in_check = False
+        if old_piece != []:
+            board[new_col][new_row] = old_piece
+
         return False, board
     elif b_king.in_check == True and player.color == BLACK:
         board[old_col][old_row] = piece
         board[new_col][new_row] = []
         w_king.in_check = False
+        if old_piece != []:
+            board[new_col][new_row] = old_piece
         return False, board
     
     # Updates the piece location.
