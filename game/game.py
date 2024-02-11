@@ -1,6 +1,7 @@
 from pieces import *
 from constants import *
 from player import *
+from graphics import *
 
 
 
@@ -139,3 +140,19 @@ class Game:
                         and self.can_capture(board, black_king, original_position) == True):
                         b_king.in_check = True
                         print("black in check")
+
+    def castling(self, screen, piece, board, new_position, original_position):
+
+        old_col, old_row = original_position
+        new_col, new_row = new_position
+
+        if new_col - old_col > 0:
+            
+            right_rook = board[old_col + 3][old_row]
+            right_rook.move((old_col + 1, old_row))
+
+            board[old_col + 1][old_row] = right_rook
+            board[old_col + 3][old_row] = []
+            board[new_col][new_row] = piece
+
+            screen.update_move(board, right_rook, (old_col + 3, old_row))

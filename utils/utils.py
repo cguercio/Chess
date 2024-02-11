@@ -31,7 +31,7 @@ def mouse_pos_to_board_pos(pos, board):
 
     return (int(math.floor(pos[0] // square_width)), int(math.floor(pos[1] // square_height)))
 
-def valid_move(piece, board, new_position, original_position, game, player):
+def valid_move(piece, board, new_position, original_position, game, player, screen):
     """
     Checks if the current move is a valid move.
 
@@ -54,6 +54,10 @@ def valid_move(piece, board, new_position, original_position, game, player):
         return False, board
     if game.piece_path(board, new_position, original_position) == False:
         return False, board
+    if isinstance(piece, King) and piece.castling == True:
+        game.castling(screen, piece, board, new_position, original_position)
+        piece.move(new_position)
+        return True, board
     if game.can_capture(board, new_position, original_position) == False:
         return False, board
 
