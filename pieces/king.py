@@ -34,6 +34,10 @@ class King(Piece):
         old_col, old_row = original_position
         new_col, new_row = new_position
         
+        if new_col in [0, COLUMNS - 1] and abs(new_row - old_row) == 0 and self.has_moved == False:
+            self.castling = True
+            return True
+            
         # Checks if the king is trying to castle.
         if abs(new_col - old_col) == 2 and abs(new_row - old_row) == 0 and self.has_moved == False:
             self.castling = True

@@ -67,6 +67,8 @@ class Game:
         old_col, old_row = original_position
         new_col, new_row = new_position
         
+        print(board[new_col][new_row])
+        
         # Checks if a piece is trying to capture and if it is a valid capture.
         if board[new_col][new_row] != [] and board[new_col][new_row].color == board[old_col][old_row].color:
             return False
@@ -144,78 +146,130 @@ class Game:
     def castling(self, screen, game, piece, board, new_position, original_position):
 
         # Unpacking the move positions.
+        num_cols = len(board[0]) # Gets the number of cols by getting the length of the first list
+        
         old_col, old_row = original_position
         new_col, new_row = new_position
+        row_diff = new_row - old_row
+        
+        col_diff = new_col - old_col
+
 
         # Finding the king locations.
-        for col, rank in enumerate(board):
-            for row, item in enumerate(rank):
-                if isinstance(item, King) and item.color == WHITE:
-                    white_king = (col, row)
-                    w_king = item
-                elif isinstance(item, King) and item.color == BLACK:
-                    black_king = (col, row)
-                    b_king = item
+        white_king_pos, white_king_object, black_king_pos, black_king_object = game.find_kings(board) 
 
         # Check if the king is currently in check.
-        game.in_check(board, white_king, black_king, w_king, b_king)
+        game.in_check(board, white_king_pos, black_king_pos, white_king_object, black_king_object)
 
         # If king is in check when castling, disallow castling and reset attributes
         if piece.in_check == True:
             piece.in_check = False
             piece.castling = False
             return False
-
-        # If castling in positive x.
-        if new_col - old_col > 0:
-
-            # Update the board to move the king one square in positive x.
-            # Checking that the king cannot castle through check.
-            board[old_col][old_row] = []
-            board[old_col + 1][old_row] = piece
-            white_king = (old_col + 1, old_row)
+        
+        # Column direction factor determines the direction of the move.
+        # This is used for the range start and step of the iteration.
+        col_dir_factor = -1 if col_diff < 0 else 1
+        
+        # left_castle is -1 if if castling queen's side. It provides an extra iteration
+        # in the negative direction when checking if the king is castling through check.
+        left_castle = -1 if col_diff < 0 else 0
+        
+        # Naming range inputs for readability.
+        range_start = col_dir_factor
+        range_end = col_diff + col_dir_factor + left_castle
+        range_step = col_dir_factor
+        
+        # Loops through the squares required to castle and checks for pieces controlling those squares.
+        for i in range(range_start, range_end, range_step):
             
+            # Calculates the int for the previous and next squares.
+            previous_col = old_col + i - col_dir_factor
+            next_col = old_col + i
             
-            # Checking if the king is in check.
-            game.in_check(board, white_king, black_king, w_king, b_king)
-
-            # If the king is in check, reset the board and king attributes.
+            # Updates the board with the new moves.
+            board[previous_col][old_row] = []
+            board[next_col][old_row] = piece
+            
+            # Updates the king position by one square to check for pieces controlling that square.
+            # The piece object cannot be used here because we do not update the piece attributes
+            # until the move is valid.
+            if piece.color == WHITE:
+                white_king_pos = (next_col, old_row)
+            else:
+                black_king_pos = (next_col, old_row)
+            
+            # Checking to see if the new square is in check.
+            game.in_check(board, white_king_pos, black_king_pos, white_king_object, black_king_object)
+                
             if piece.in_check == True:
-                board = self.reset_castling(piece, board, new_col, new_row, old_col, old_row)
+                board = self.reset_castling(piece, board, new_col, new_row, old_col, old_row, i)
                 return False
+        
+        if left_castle == -1:
+            board[next_col][old_row] = []
+            
+        board[new_col][new_row] = piece
+        
+        
+        # Finds the appropriate rook object depending on which direction the user castled.
+        rook_col = 0 if col_diff < 0 else num_cols - 1
+        rook = board[rook_col][old_row]
+        
+        # Update the board with rook move if castling is allowed.
+        board[rook_col][old_row] = []
+        board[new_col + col_dir_factor * -1][old_row] = rook
 
-            # Update the board to move the king two squares in positive x.
-            board[old_col + 1][old_row] = []
-            board[old_col + 2][old_row] = piece
-            white_king = (old_col + 2, old_row)
+        # Update the pieces attributes
+        piece.move(new_position)
+        rook.move((new_col + col_dir_factor * -1, old_row))
 
-            # Checking if the king is in check.
-            game.in_check(board, white_king, black_king, w_king, b_king)
+        # Draw the rook move on the screen. 
+        screen.update_move(board, rook, (rook_col, old_row))
+        return True, board
 
-            # If the king is in check, reset the board and king attributes.
-            if piece.in_check == True:
-                board = self.reset_castling(piece, board, new_col, new_row, old_col, old_row)
-                return False
+    def reset_castling(self, piece, board, new_col, new_row, old_col, old_row, i):
+        """
+        Resets the board and king attributes.
 
-            # Update the board with rook move if castling is allowed.
-            right_rook = board[old_col + 3][old_row]
-            board[old_col + 3][old_row] = []
-            board[old_col + 1][old_row] = right_rook
+        Args:
+            piece (object): Piece being moved.
+            board (list): Chessboard as a 2D list.
+            new_col (int): New position column.
+            new_row (int): New position row.
+            old_col (int): Old position column.
+            old_row (int): Old position row.
+            i (int): Index
 
-            # Update the pieces attributes
-            piece.move(new_position)
-            right_rook.move((old_col + 1, old_row))
-
-            # Draw the rook move on the screen. 
-            screen.update_move(board, right_rook, (old_col + 3, old_row))
-        return True
-
-    def reset_castling(self, piece, board, new_col, new_row, old_col, old_row):
+        Returns:
+            _type_: _description_
+        """
+        
         piece.in_check = False
         piece.castling = False
         board[old_col][old_row] = piece
         board[new_col][new_row] = []
-        board[old_col + 1][old_row] = []
-        board[old_col + 2][old_row] = []
-
+        board[old_col + i][old_row] = []
         return board
+    
+    def find_kings(self, board):
+        """
+        Find the location of the kings on any given board.
+
+        Args:
+            board (list): Chessboard as a 2D list.
+
+        Returns:
+            tuple, object: Returns king locations and objects.
+        """
+        
+        for col, rank in enumerate(board):
+            for row, item in enumerate(rank):
+                if isinstance(item, King) and item.color == WHITE:
+                    white_king_pos = (col, row)
+                    white_king_object = item
+                elif isinstance(item, King) and item.color == BLACK:
+                    black_king_pos = (col, row)
+                    black_king_object = item
+                    
+        return white_king_pos, white_king_object, black_king_pos, black_king_object
