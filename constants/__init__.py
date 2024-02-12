@@ -1,3 +1,3 @@
 from .constants import *
 
-__all__ = ["WIDTH", "HEIGHT", "WHITE", "BLACK", "FPS", "GREEN"]
+__all__ = ["WIDTH", "HEIGHT", "WHITE", "BLACK", "FPS", "GREEN", "ROWS", "COLUMNS"]
