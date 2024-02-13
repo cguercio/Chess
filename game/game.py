@@ -110,7 +110,7 @@ class Game:
         # self.update_capture(board, new_col, new_row)        
         return True
     
-    def in_check(self, board, white_king, black_king, w_king, b_king):
+    def in_check(self, board, white_king_pos, white_king_object, black_king_pos, black_king_object):
         """
         Checks both kings for check and sets check
         attribute to True if necessary.
@@ -121,8 +121,8 @@ class Game:
             b_king (object): Black king.
         """
 
-        w_king.in_check = False
-        b_king.in_check = False
+        white_king_object.in_check = False
+        black_king_object.in_check = False
         
         # Looping thought piece objects.
         for col, rank in enumerate(board):
@@ -130,17 +130,17 @@ class Game:
                 if piece != []:
                     original_position = (col, row)
                     # Trying to move all black pieces to the white king.
-                    if (piece.color == BLACK and piece.valid_move(white_king, original_position) == True
-                        and self.piece_path(board, white_king, original_position) == True
-                        and self.can_capture(board, white_king, original_position) == True):
+                    if (piece.color == BLACK and piece.valid_move(white_king_pos, original_position) == True
+                        and self.piece_path(board, white_king_pos, original_position) == True
+                        and self.can_capture(board, white_king_pos, original_position) == True):
                         print("white in check")
-                        w_king.in_check = True
+                        white_king_object.in_check = True
 
                     # Trying to move all white pieces to the black king.
-                    elif (piece.color == WHITE and piece.valid_move(black_king, original_position) == True
-                        and self.piece_path(board, black_king, original_position) == True
-                        and self.can_capture(board, black_king, original_position) == True):
-                        b_king.in_check = True
+                    elif (piece.color == WHITE and piece.valid_move(black_king_pos, original_position) == True
+                        and self.piece_path(board, black_king_pos, original_position) == True
+                        and self.can_capture(board, black_king_pos, original_position) == True):
+                        black_king_object.in_check = True
                         print("black in check")
 
     def castling(self, screen, game, piece, board, new_position, original_position):
@@ -159,13 +159,13 @@ class Game:
         white_king_pos, white_king_object, black_king_pos, black_king_object = game.find_kings(board) 
 
         # Check if the king is currently in check.
-        game.in_check(board, white_king_pos, black_king_pos, white_king_object, black_king_object)
+        game.in_check(board, white_king_pos, white_king_object, black_king_pos, black_king_object)
 
         # If king is in check when castling, disallow castling and reset attributes
         if piece.in_check == True:
             piece.in_check = False
             piece.castling = False
-            return False
+            return False, board
         
         # Column direction factor determines the direction of the move.
         # This is used for the range start and step of the iteration.
@@ -200,11 +200,11 @@ class Game:
                 black_king_pos = (next_col, old_row)
             
             # Checking to see if the new square is in check.
-            game.in_check(board, white_king_pos, black_king_pos, white_king_object, black_king_object)
+            game.in_check(board, white_king_pos, white_king_object, black_king_pos, black_king_object)
                 
             if piece.in_check == True:
                 board = self.reset_castling(piece, board, new_col, new_row, old_col, old_row, i)
-                return False
+                return False, board
         
         if left_castle == -1:
             board[next_col][old_row] = []

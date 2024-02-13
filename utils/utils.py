@@ -62,39 +62,32 @@ def valid_move(piece, board, new_position, original_position, game, player, scre
     if game.can_capture(board, new_position, original_position) == False:
         return False, board
 
-    # Updates the temp board with the new move 
+    # Updates the temp board with the new move.
     # so we can check for checks on the king.
     board[old_col][old_row] = []
     board[new_col][new_row] = piece
     
     # Finds the location of the kings on the temp board.
-    # We cannot use the king objects to find the locations
-    # here because the pieces has not moved yet.
-    for col, rank in enumerate(board):
-        for row, item in enumerate(rank):
-            if isinstance(item, King) and item.color == WHITE:
-                white_king = (col, row)
-                w_king = item
-            elif isinstance(item, King) and item.color == BLACK:
-                black_king = (col, row)
-                b_king = item
+    white_king_pos, white_king_object, black_king_pos, black_king_object = game.find_kings(board) 
     
     # Checking if the kings are in check and updating their attribute.
-    game.in_check(board, white_king, black_king, w_king, b_king)
+    game.in_check(board, white_king_pos, white_king_object, black_king_pos, black_king_object)
 
     # Checks if the player tries to make a move, but their king is still in check.
-    if w_king.in_check == True and player.color == WHITE:
+    if white_king_object.in_check == True and player.color == WHITE:
         board[old_col][old_row] = piece
         board[new_col][new_row] = []
-        b_king.in_check = False
+        black_king_object.in_check = False
+        # If a piece was captured during but king still in check; reset the piece.
         if old_piece != []:
             board[new_col][new_row] = old_piece
 
         return False, board
-    elif b_king.in_check == True and player.color == BLACK:
+    elif black_king_object.in_check == True and player.color == BLACK:
         board[old_col][old_row] = piece
         board[new_col][new_row] = []
-        w_king.in_check = False
+        white_king_object.in_check = False
+        # If a piece was captured during but king still in check; reset the piece.
         if old_piece != []:
             board[new_col][new_row] = old_piece
         return False, board
@@ -165,9 +158,9 @@ def board_navigation(screen, board, move_list, index, key):
             piece = move[0]
             new_col, new_row = move[1]
             old_col, old_row = move[2]
-            old_piece =[]
+            old_piece = []
 
-            # It is important that this index is after the function
+            # It is important that this index is after the index call.
             index -= 1
 
             # Drawing the updated move on the screen.
