@@ -38,7 +38,7 @@ class Screen:
 
         pygame.display.update()
 
-    def draw_pieces(self, board):
+    def draw_pieces(self, chessboard):
         """
         Loops through the chessboard, finds the pieces, centers and displays the pieces.
 
@@ -47,11 +47,11 @@ class Screen:
         """
         
         # Gets the size of the board in x and y.
-        num_cols = len(board[0])
-        num_rows = len(board)
+        num_cols = len(chessboard.board[0])
+        num_rows = len(chessboard.board)
 
         # Loops through the board, finds the pieces, centers and displays the pieces
-        for row in board:
+        for row in chessboard.board:
             for piece in row:
                 if isinstance(piece, Piece):
                     img = pygame.image.load(piece.img)
@@ -63,7 +63,7 @@ class Screen:
 
         pygame.display.update()
 
-    def update_move(self, board, piece, original_position):
+    def update_move(self, chessboard, piece, original_position):
         """
         Clears the starting square, clears the new square,
         displays the piece on the new square.
@@ -76,8 +76,8 @@ class Screen:
         
         
         # Gets the size of the board in x and y.
-        num_cols = len(board[0])
-        num_rows = len(board)
+        num_cols = len(chessboard.board[0])
+        num_rows = len(chessboard.board)
 
         # Getting the height and width of the squares
         square_width = self.width // num_cols
@@ -105,7 +105,7 @@ class Screen:
         self.win.blit(img, (x_pos, y_pos))
         pygame.display.update()
 
-    def draw_board_navigation(self, board, piece, new_col, new_row, old_col, old_row, old_piece):
+    def draw_board_navigation(self, chessboard, piece, new_col, new_row, old_col, old_row, old_piece):
         """
         Draws the moves when navigating the previous moves.
 
@@ -119,8 +119,8 @@ class Screen:
             old_piece (object): Piece of there was a capture on the move.
         """
         # Gets the size of the board in x and y.
-        num_cols = len(board[0])
-        num_rows = len(board)
+        num_cols = len(chessboard.board[0])
+        num_rows = len(chessboard.board)
         
         # Getting the height and width of the squares
         square_width = WIDTH // num_cols

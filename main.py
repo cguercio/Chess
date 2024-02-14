@@ -14,16 +14,16 @@ def main():
     
     # Initiating the board and drawing squares
     screen = Screen(WIDTH, HEIGHT)
-    board = Board(8, 8)
+    chessboard = Board(8, 8)
     starting_board = Board(8, 8)
-    square_list = board.squares()
+    square_list = chessboard.squares()
     screen.draw_squares(square_list, WHITE, GREEN)
 
     # Initiating black piece objects: qs = queens-side, ks = kings-side
     qs_rook = Rook(0, 0, BLACK)
     # qs_knight = Knight(1, 0, BLACK)
     # qs_bishop = Bishop(2, 0, BLACK)
-    # b_queen = Queen(3, 0, BLACK)
+    b_queen = Queen(3, 0, BLACK)
     b_king = King(4, 0, BLACK)
     # ks_bishop = Bishop(5, 0, BLACK)
     # ks_knight = Knight(6, 0, BLACK)
@@ -41,7 +41,7 @@ def main():
     qs_rook = Rook(0, 7, WHITE)
     # qs_knight = Knight(1, 7, WHITE)
     # qs_bishop = Bishop(2, 7, WHITE)
-    # w_queen = Queen(3, 7, WHITE)
+    w_queen = Queen(3, 7, WHITE)
     w_king = King(4, 7, WHITE)
     # ks_bishop = Bishop(5, 7, WHITE)
     # ks_knight = Knight(6, 7, WHITE)
@@ -63,11 +63,11 @@ def main():
 
     # Placing the pieces on the board.
     for item in Piece.instances:
-        board.place_piece(item)
+        chessboard.place_piece(item)
         starting_board.place_piece(item)
 
     # Draws the pieces at their starting squares.
-    screen.draw_pieces(board.board)
+    screen.draw_pieces(chessboard)
 
     move_list = []
     index = 0
@@ -97,7 +97,7 @@ def main():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_DOWN:
                         index = len(move_list) # It is important that this index is before the function
-                        if board_navigation(screen, board.board, move_list, index, event.key) == False:
+                        if board_navigation(screen, chessboard, move_list, index, event.key) == False:
                             index = len(move_list)
                         else:
                             pass
@@ -105,14 +105,14 @@ def main():
                     # Calls board navigation if user presses left.
                     if event.key == pygame.K_LEFT:
                         index += 1 # It is important that this index is before the function
-                        if board_navigation(screen, board.board, move_list, index, event.key) == False:
+                        if board_navigation(screen, chessboard, move_list, index, event.key) == False:
                             index = len(move_list)
                         else:
                             pass
                     
                     # Calls board navigation if user presses right.
                     if event.key == pygame.K_RIGHT:
-                        if board_navigation(screen, board.board, move_list, index, event.key) == False:
+                        if board_navigation(screen, chessboard, move_list, index, event.key) == False:
                             index = 0
                         else:
                             index -= 1
@@ -120,23 +120,23 @@ def main():
                     # Displays the current board and escapes from board navigation.
                     if event.key == pygame.K_ESCAPE or event.key == pygame.K_UP:
                         screen.draw_squares(square_list, WHITE, GREEN)
-                        screen.draw_pieces(board.board)
+                        screen.draw_pieces(chessboard)
                         index = 0
 
             
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
-                    state, piece, original_position = player_one.move(mouse_pos, board.board)
+                    state, piece, original_position = player_one.move(mouse_pos, chessboard)
                     if state == True and piece.color == WHITE:
                         wait()
                         mouse_pos2 = pygame.mouse.get_pos()
-                        new_position = mouse_pos_to_board_pos(mouse_pos2, board.board)
-                        temp_board = copy.copy(board.board)
-                        old_piece = board.board[new_position[0]][new_position[1]]
+                        new_position = mouse_pos_to_board_pos(mouse_pos2, chessboard)
+                        old_piece = chessboard.board[new_position[0]][new_position[1]]
+                        temp_board = copy.copy(chessboard)
                         result, next_board = valid_move(piece, temp_board, new_position, original_position, game, player_one, screen)
                         if result == True:
-                            board.board = next_board
-                            screen.update_move(board.board, piece, original_position)
+                            chessboard.board = next_board.board
+                            screen.update_move(chessboard, piece, original_position)
                             move_list.append((piece, new_position, original_position, old_piece))
                             player_one.turn = False
                             player_two.turn = True
@@ -157,7 +157,7 @@ def main():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_DOWN:
                         index = len(move_list) # It is important that this index is before the function
-                        if board_navigation(screen, board.board, move_list, index, event.key) == False:
+                        if board_navigation(screen, chessboard, move_list, index, event.key) == False:
                             index = len(move_list)
                         else:
                             pass
@@ -165,14 +165,14 @@ def main():
                 # Calls board navigation if user presses left.
                     if event.key == pygame.K_LEFT:
                         index += 1 # It is important that this index is before the function
-                        if board_navigation(screen, board.board, move_list, index, event.key) == False:
+                        if board_navigation(screen, chessboard, move_list, index, event.key) == False:
                             index = len(move_list)
                         else:
                             pass
                     
                     # Calls board navigation if user presses right.
                     if event.key == pygame.K_RIGHT:
-                        if board_navigation(screen, board.board, move_list, index, event.key) == False:
+                        if board_navigation(screen, chessboard, move_list, index, event.key) == False:
                             index = 0
                         else:
                             index -= 1
@@ -180,23 +180,23 @@ def main():
                     # Displays the current board and escapes from board navigation
                     if event.key == pygame.K_ESCAPE or event.key == pygame.K_UP:
                         screen.draw_squares(square_list, WHITE, GREEN)
-                        screen.draw_pieces(board.board)
+                        screen.draw_pieces(chessboard)
                         index = 0
             
             
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
-                    state, piece, original_position = player_two.move(mouse_pos, board.board)
+                    state, piece, original_position = player_two.move(mouse_pos, chessboard)
                     if state == True and piece.color == BLACK:
                         wait()
                         mouse_pos2 = pygame.mouse.get_pos()
-                        new_position = mouse_pos_to_board_pos(mouse_pos2, board.board)
-                        temp_board = copy.copy(board.board)
-                        old_piece = board.board[new_position[0]][new_position[1]]
+                        new_position = mouse_pos_to_board_pos(mouse_pos2, chessboard)
+                        temp_board = copy.copy(chessboard)
+                        old_piece = chessboard.board[new_position[0]][new_position[1]]
                         result, next_board = valid_move(piece, temp_board, new_position, original_position, game, player_two, screen)
                         if result == True:
-                                board.board = next_board
-                                screen.update_move(board.board, piece, original_position)
+                                chessboard.board = next_board.board
+                                screen.update_move(chessboard, piece, original_position)
                                 move_list.append((piece, new_position, original_position, old_piece))
                                 player_two.turn = False
                                 player_one.turn = True

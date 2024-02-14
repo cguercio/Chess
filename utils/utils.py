@@ -12,7 +12,7 @@ def wait():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 return
             
-def mouse_pos_to_board_pos(pos, board):
+def mouse_pos_to_board_pos(pos, chessboard):
     """
     Converts the mouse position to the board position.
 
@@ -24,14 +24,14 @@ def mouse_pos_to_board_pos(pos, board):
         tuple: Returns the new board position.
     """
     
-    num_cols = len(board[0]) # Gets the number of cols by getting the length of the first list
-    num_rows = len(board) # Gets the number of rows by getting the number of lists
+    num_cols = len(chessboard.board[0]) # Gets the number of cols by getting the length of the first list
+    num_rows = len(chessboard.board) # Gets the number of rows by getting the number of lists
     square_width = WIDTH // num_cols
     square_height = HEIGHT // num_rows
 
     return (int(math.floor(pos[0] // square_width)), int(math.floor(pos[1] // square_height)))
 
-def valid_move(piece, board, new_position, original_position, game, player, screen):
+def valid_move(piece, chessboard, new_position, original_position, game, player, screen):
     """
     Checks if the current move is a valid move.
 
@@ -47,59 +47,62 @@ def valid_move(piece, board, new_position, original_position, game, player, scre
     # Unpacks the original and new piece positions.
     old_col, old_row = original_position
     new_col, new_row = new_position
-    old_piece = board[new_col][new_row]
     
     # Runs different checks for valid moves.
     if piece.valid_move(new_position, original_position) == False:
-        return False, board
-    if game.piece_path(board, new_position, original_position) == False:
-        return False, board
+        print("1")
+        return False, chessboard
+    if game.piece_path(chessboard, new_position, original_position) == False:
+        print("2")
+        return False, chessboard
     if isinstance(piece, King) and piece.castling == True:
         new_king_position = (6, old_row) if new_col - old_col > 0 else (2, old_row)
-        can_castle, board = game.castling(screen, game, piece, board, new_king_position, original_position)
+        can_castle, chessboard = game.castling(screen, game, piece, chessboard, new_king_position, original_position)
         piece.castling = False
-        return can_castle, board
-    if game.can_capture(board, new_position, original_position) == False:
-        return False, board
+        print("3")
+        return can_castle, chessboard
+    if game.can_capture(chessboard, new_position, original_position) == False:
+        print("4")
+        return False, chessboard
 
     # Updates the temp board with the new move.
     # so we can check for checks on the king.
-    board[old_col][old_row] = []
-    board[new_col][new_row] = piece
+    chessboard.board[old_col][old_row] = []
+    chessboard.board[new_col][new_row] = piece
     
     # Finds the location of the kings on the temp board.
-    white_king_pos, white_king_object, black_king_pos, black_king_object = game.find_kings(board) 
+    white_king_pos, white_king_object, black_king_pos, black_king_object = game.find_kings(chessboard) 
     
     # Checking if the kings are in check and updating their attribute.
-    game.in_check(board, white_king_pos, white_king_object, black_king_pos, black_king_object)
+    game.in_check(chessboard, white_king_pos, white_king_object, black_king_pos, black_king_object)
 
     # Checks if the player tries to make a move, but their king is still in check.
     if white_king_object.in_check == True and player.color == WHITE:
-        board[old_col][old_row] = piece
-        board[new_col][new_row] = []
+        chessboard.board[old_col][old_row] = piece
+        chessboard.board[new_col][new_row] = []
         black_king_object.in_check = False
         # If a piece was captured during but king still in check; reset the piece.
         if old_piece != []:
-            board[new_col][new_row] = old_piece
-
-        return False, board
+            chessboard.board[new_col][new_row] = old_piece
+        return False, chessboard
+    
     elif black_king_object.in_check == True and player.color == BLACK:
-        board[old_col][old_row] = piece
-        board[new_col][new_row] = []
+        chessboard.board[old_col][old_row] = piece
+        chessboard.board[new_col][new_row] = []
         white_king_object.in_check = False
         # If a piece was captured during but king still in check; reset the piece.
         if old_piece != []:
-            board[new_col][new_row] = old_piece
-        return False, board
+            chessboard.board[new_col][new_row] = old_piece
+        return False, chessboard
     
     # Updates the piece location.
     piece.move(new_position)
 
-    return True, board
+    return True, chessboard
 
 
 
-def board_navigation(screen, board, move_list, index, key):
+def board_navigation(screen, chessboard, move_list, index, key):
     """
     Cycles through the move list forwards or backwards.
 
@@ -122,7 +125,7 @@ def board_navigation(screen, board, move_list, index, key):
             new_col, new_row = move[2]
             old_piece = move[3]
 
-            screen.draw_board_navigation(board, piece, new_col, new_row, old_col, old_row, old_piece)
+            screen.draw_board_navigation(chessboard.board, piece, new_col, new_row, old_col, old_row, old_piece)
 
     # If key is left arrow, visually undo the moves.
     if key == pygame.K_LEFT:
@@ -142,7 +145,7 @@ def board_navigation(screen, board, move_list, index, key):
             old_piece = move[3]
 
             # Drawing the updated move on the screen.
-            screen.draw_board_navigation(board, piece, new_col, new_row, old_col, old_row, old_piece)
+            screen.draw_board_navigation(chessboard.board, piece, new_col, new_row, old_col, old_row, old_piece)
             
     # If key is right arrow, visually redo the moves.
     if key == pygame.K_RIGHT:
@@ -164,5 +167,5 @@ def board_navigation(screen, board, move_list, index, key):
             index -= 1
 
             # Drawing the updated move on the screen.
-            screen.draw_board_navigation(board, piece, new_col, new_row, old_col, old_row, old_piece)
+            screen.draw_board_navigation(chessboard.board, piece, new_col, new_row, old_col, old_row, old_piece)
             

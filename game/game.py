@@ -9,7 +9,7 @@ from graphics import *
 class Game:
     
     # Checks if the move is blocked by another piece.
-    def piece_path(self, board, new_position, original_position):
+    def piece_path(self, chessboard, new_position, original_position):
         """
         Checks if a move is valid for a given chess piece on the board.
 
@@ -47,12 +47,12 @@ class Game:
         piece_path = list(zip(x_points, y_points))
         
         for point in piece_path:
-            if board[point[0]][point[1]] != []:
+            if chessboard.board[point[0]][point[1]] != []:
                 return False
 
         return True
     
-    def can_capture(self, board, new_position, original_position):
+    def can_capture(self, chessboard, new_position, original_position):
         """
         Checks that the pieces only capture pieces of opposite color.
 
@@ -67,19 +67,18 @@ class Game:
         old_col, old_row = original_position
         new_col, new_row = new_position
         
-        print(board[new_col][new_row])
-        
         # Checks if a piece is trying to capture and if it is a valid capture.
-        if board[new_col][new_row] != [] and board[new_col][new_row].color == board[old_col][old_row].color:
+        if (chessboard.board[new_col][new_row] != []
+            and chessboard.board[new_col][new_row].color == chessboard.board[old_col][old_row].color):
             return False
         
         # Calls pawn capture logic if piece is a pawn.
-        if isinstance(board[old_col][old_row], Pawn):
-            return self.pawn_can_capture(board, new_position, original_position)
+        if isinstance(chessboard.board[old_col][old_row], Pawn):
+            return self.pawn_can_capture(chessboard, new_position, original_position)
         
         return True
         
-    def pawn_can_capture(self, board, new_position, original_position):
+    def pawn_can_capture(self, chessboard, new_position, original_position):
         """
         Checks for pieces in front of moving pawns and checks for piece when pawn
         tries to capture.
@@ -99,18 +98,18 @@ class Game:
         new_col, new_row = new_position
         
         # Check if piece is in front of moving pawn, disallowing movement or capture.
-        if (board[new_col][new_row] and new_col == old_col):
+        if (chessboard.board[new_col][new_row] and new_col == old_col):
             return False
         
         # Checks if pawn tries move to capture square but there is
         # no piece to capture, disallow capture or movement.
-        elif not board[new_col][new_row] and new_col != old_col:
+        elif not chessboard.board[new_col][new_row] and new_col != old_col:
             return False
         
         # self.update_capture(board, new_col, new_row)        
         return True
     
-    def in_check(self, board, white_king_pos, white_king_object, black_king_pos, black_king_object):
+    def in_check(self, chessboard, white_king_pos, white_king_object, black_king_pos, black_king_object):
         """
         Checks both kings for check and sets check
         attribute to True if necessary.
@@ -125,28 +124,28 @@ class Game:
         black_king_object.in_check = False
         
         # Looping thought piece objects.
-        for col, rank in enumerate(board):
+        for col, rank in enumerate(chessboard.board):
             for row, piece in enumerate(rank):
                 if piece != []:
                     original_position = (col, row)
                     # Trying to move all black pieces to the white king.
                     if (piece.color == BLACK and piece.valid_move(white_king_pos, original_position) == True
-                        and self.piece_path(board, white_king_pos, original_position) == True
-                        and self.can_capture(board, white_king_pos, original_position) == True):
+                        and self.piece_path(chessboard, white_king_pos, original_position) == True
+                        and self.can_capture(chessboard, white_king_pos, original_position) == True):
                         print("white in check")
                         white_king_object.in_check = True
 
                     # Trying to move all white pieces to the black king.
                     elif (piece.color == WHITE and piece.valid_move(black_king_pos, original_position) == True
-                        and self.piece_path(board, black_king_pos, original_position) == True
-                        and self.can_capture(board, black_king_pos, original_position) == True):
+                        and self.piece_path(chessboard, black_king_pos, original_position) == True
+                        and self.can_capture(chessboard, black_king_pos, original_position) == True):
                         black_king_object.in_check = True
                         print("black in check")
 
-    def castling(self, screen, game, piece, board, new_position, original_position):
+    def castling(self, screen, game, piece, chessboard, new_position, original_position):
 
         # Unpacking the move positions.
-        num_cols = len(board[0]) # Gets the number of cols by getting the length of the first list
+        num_cols = len(chessboard.board[0]) # Gets the number of cols by getting the length of the first list
         
         old_col, old_row = original_position
         new_col, new_row = new_position
@@ -156,16 +155,16 @@ class Game:
 
 
         # Finding the king locations.
-        white_king_pos, white_king_object, black_king_pos, black_king_object = game.find_kings(board) 
+        white_king_pos, white_king_object, black_king_pos, black_king_object = game.find_kings(chessboard) 
 
         # Check if the king is currently in check.
-        game.in_check(board, white_king_pos, white_king_object, black_king_pos, black_king_object)
+        game.in_check(chessboard, white_king_pos, white_king_object, black_king_pos, black_king_object)
 
         # If king is in check when castling, disallow castling and reset attributes
         if piece.in_check == True:
             piece.in_check = False
             piece.castling = False
-            return False, board
+            return False, chessboard
         
         # Column direction factor determines the direction of the move.
         # This is used for the range start and step of the iteration.
@@ -188,8 +187,8 @@ class Game:
             next_col = old_col + i
             
             # Updates the board with the new moves.
-            board[previous_col][old_row] = []
-            board[next_col][old_row] = piece
+            
+            chessboard.update_board(piece, (next_col, old_row), (previous_col, old_row))
             
             # Updates the king position by one square to check for pieces controlling that square.
             # The piece object cannot be used here because we do not update the piece attributes
@@ -200,59 +199,35 @@ class Game:
                 black_king_pos = (next_col, old_row)
             
             # Checking to see if the new square is in check.
-            game.in_check(board, white_king_pos, white_king_object, black_king_pos, black_king_object)
+            game.in_check(chessboard, white_king_pos, white_king_object, black_king_pos, black_king_object)
                 
+            # Checks if the king is in check.
             if piece.in_check == True:
-                board = self.reset_castling(piece, board, new_col, new_row, old_col, old_row, i)
-                return False, board
+                chessboard.reset_castling(piece, new_position, original_position, i)
+                return False, chessboard
         
+        # If the king castles in negative x an extra square is reset.
         if left_castle == -1:
-            board[next_col][old_row] = []
-            
-        board[new_col][new_row] = piece
-        
-        
+            chessboard.update_board(piece, (new_col, new_row), (next_col, old_row))
+
         # Finds the appropriate rook object depending on which direction the user castled.
         rook_col = 0 if col_diff < 0 else num_cols - 1
-        rook = board[rook_col][old_row]
+        rook = chessboard.board[rook_col][old_row]
         
         # Update the board with rook move if castling is allowed.
-        board[rook_col][old_row] = []
-        board[new_col + col_dir_factor * -1][old_row] = rook
+        chessboard.board[rook_col][old_row] = []
+        chessboard.board[new_col + col_dir_factor * -1][old_row] = rook
 
         # Update the pieces attributes
         piece.move(new_position)
         rook.move((new_col + col_dir_factor * -1, old_row))
 
         # Draw the rook move on the screen. 
-        screen.update_move(board, rook, (rook_col, old_row))
-        return True, board
+        screen.update_move(chessboard, rook, (rook_col, old_row))
+        piece.has_moved = True
+        return True, chessboard
 
-    def reset_castling(self, piece, board, new_col, new_row, old_col, old_row, i):
-        """
-        Resets the board and king attributes.
-
-        Args:
-            piece (object): Piece being moved.
-            board (list): Chessboard as a 2D list.
-            new_col (int): New position column.
-            new_row (int): New position row.
-            old_col (int): Old position column.
-            old_row (int): Old position row.
-            i (int): Index
-
-        Returns:
-            _type_: _description_
-        """
-        
-        piece.in_check = False
-        piece.castling = False
-        board[old_col][old_row] = piece
-        board[new_col][new_row] = []
-        board[old_col + i][old_row] = []
-        return board
-    
-    def find_kings(self, board):
+    def find_kings(self, chessboard):
         """
         Find the location of the kings on any given board.
 
@@ -263,7 +238,7 @@ class Game:
             tuple, object: Returns king locations and objects.
         """
         
-        for col, rank in enumerate(board):
+        for col, rank in enumerate(chessboard.board):
             for row, item in enumerate(rank):
                 if isinstance(item, King) and item.color == WHITE:
                     white_king_pos = (col, row)
