@@ -62,7 +62,8 @@ class Board:
         self.board[old_col][old_row] = []
         self.board[new_col][new_row] = piece
         
-    def reset_board(self, piece, new_position, original_position):
+    def reset_board(self, piece, new_position, original_position, old_piece=[]):
+        # sourcery skip: default-mutable-arg
         """
         Places the piece at it's new square and clears the old square.
 
@@ -75,8 +76,8 @@ class Board:
         old_col, old_row = original_position
         new_col, new_row = new_position
         
-        self.board[old_col][old_row] = []
-        self.board[new_col][new_row] = piece
+        self.board[old_col][old_row] = piece
+        self.board[new_col][new_row] = old_piece if old_piece != [] else []
         
     def reset_castling(self, piece, new_position, original_position, i):
         """

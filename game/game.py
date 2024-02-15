@@ -215,9 +215,9 @@ class Game:
         rook = chessboard.board[rook_col][old_row]
         
         # Update the board with rook move if castling is allowed.
-        chessboard.board[rook_col][old_row] = []
-        chessboard.board[new_col + col_dir_factor * -1][old_row] = rook
-
+        new_rook_col = new_col + col_dir_factor * -1
+        chessboard.update_board(rook, (new_rook_col, new_row), (rook_col, old_row))
+        
         # Update the pieces attributes
         piece.move(new_position)
         rook.move((new_col + col_dir_factor * -1, old_row))

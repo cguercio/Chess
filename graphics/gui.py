@@ -104,6 +104,70 @@ class Screen:
         y_pos = piece.y * HEIGHT // num_rows + img_offset_y
         self.win.blit(img, (x_pos, y_pos))
         pygame.display.update()
+        
+    def display_start_board(self, chessboard, move_list):
+        """
+        Displays the starting board.
+
+        Args:
+            chessboard (list): Chessboard as a 2D list.
+            move_list (list): List of tuples containing information about each move.
+        """
+        
+        for move in move_list[::-1]:
+            piece = move[0]
+            old_col, old_row = move[1]
+            new_col, new_row = move[2]
+            old_piece = move[3]
+
+            self.draw_board_navigation(chessboard, piece, new_col, new_row, old_col, old_row, old_piece)
+                
+    def display_previous_move(self, chessboard, move_list, index):
+        """
+        Displays the previous move on the board.
+
+        Args:
+            chessboard (list): Chessboard as a 2D list.
+            move_list (list): List of tuples containing information about each move.
+            index (int): Index used for slicing the move list.
+        """
+        
+        # Finding the move to undo by slicing the move list with index.
+        move = move_list[len(move_list) - index]
+
+        # Extracting the info needed from move list tuple.
+        piece = move[0]
+        old_col, old_row = move[1]
+        new_col, new_row = move[2]
+        old_piece = move[3]
+
+        # Drawing the updated move on the screen.
+        self.draw_board_navigation(chessboard, piece, new_col, new_row, old_col, old_row, old_piece)
+        
+    def display_next_move(self, chessboard, move_list, index):
+        """
+        Displays the next move on the board.
+
+        Args:
+            chessboard (list): Chessboard as a 2D list.
+            move_list (list): List of tuples containing information about each move.
+            index (int): Index used for slicing the move list.
+        """
+        
+        # Finding the move to undo by slicing the move list with index.
+        move = move_list[len(move_list) - index]
+
+        # Extracting the info needed from move list tuple.
+        piece = move[0]
+        new_col, new_row = move[1]
+        old_col, old_row = move[2]
+        old_piece = []
+
+        # It is important that this index is after the index call.
+        index -= 1
+
+        # Drawing the updated move on the screen.
+        self.draw_board_navigation(chessboard, piece, new_col, new_row, old_col, old_row, old_piece)
 
     def draw_board_navigation(self, chessboard, piece, new_col, new_row, old_col, old_row, old_piece):
         """

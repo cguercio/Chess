@@ -31,7 +31,7 @@ def mouse_pos_to_board_pos(pos, chessboard):
 
     return (int(math.floor(pos[0] // square_width)), int(math.floor(pos[1] // square_height)))
 
-def valid_move(piece, chessboard, new_position, original_position, game, player, screen):
+def valid_move(piece, old_piece, chessboard, new_position, original_position, game, screen):
     """
     Checks if the current move is a valid move.
 
@@ -67,8 +67,7 @@ def valid_move(piece, chessboard, new_position, original_position, game, player,
 
     # Updates the temp board with the new move.
     # so we can check for checks on the king.
-    chessboard.board[old_col][old_row] = []
-    chessboard.board[new_col][new_row] = piece
+    chessboard.update_board(piece, new_position, original_position)
     
     # Finds the location of the kings on the temp board.
     white_king_pos, white_king_object, black_king_pos, black_king_object = game.find_kings(chessboard) 
@@ -76,96 +75,18 @@ def valid_move(piece, chessboard, new_position, original_position, game, player,
     # Checking if the kings are in check and updating their attribute.
     game.in_check(chessboard, white_king_pos, white_king_object, black_king_pos, black_king_object)
 
-    # Checks if the player tries to make a move, but their king is still in check.
-    if white_king_object.in_check == True and player.color == WHITE:
-        chessboard.board[old_col][old_row] = piece
-        chessboard.board[new_col][new_row] = []
+    # Checks if the king of the moving piece's color is in check.
+    if white_king_object.in_check == True and piece.color == WHITE:
+        chessboard.reset_board(piece, new_position, original_position, old_piece)
         black_king_object.in_check = False
-        # If a piece was captured during but king still in check; reset the piece.
-        if old_piece != []:
-            chessboard.board[new_col][new_row] = old_piece
         return False, chessboard
     
-    elif black_king_object.in_check == True and player.color == BLACK:
-        chessboard.board[old_col][old_row] = piece
-        chessboard.board[new_col][new_row] = []
+    elif black_king_object.in_check == True and piece.color == BLACK:
+        chessboard.reset_board(piece, new_position, original_position, old_piece)
         white_king_object.in_check = False
-        # If a piece was captured during but king still in check; reset the piece.
-        if old_piece != []:
-            chessboard.board[new_col][new_row] = old_piece
         return False, chessboard
     
     # Updates the piece location.
     piece.move(new_position)
 
     return True, chessboard
-
-
-
-def board_navigation(screen, chessboard, move_list, index, key):
-    """
-    Cycles through the move list forwards or backwards.
-
-    Args:
-        screen (object): Screen object.
-        board (list): Chessboard as a 2D list.
-        move_list (list): List of tuples containing previous move info.
-        index (int): Index for iterating over move list.
-        key (key): Pygame key press.
-
-    Returns:
-        boolean: Returns false if index is at the start or end of the list.
-    """
-    
-    # If use presses the down arrow go to the start of the move list.
-    if key == pygame.K_DOWN:
-        for move in move_list[::-1]:
-            piece = move[0]
-            old_col, old_row = move[1]
-            new_col, new_row = move[2]
-            old_piece = move[3]
-
-            screen.draw_board_navigation(chessboard.board, piece, new_col, new_row, old_col, old_row, old_piece)
-
-    # If key is left arrow, visually undo the moves.
-    if key == pygame.K_LEFT:
-
-        # If we are at the start of the list, return false.
-        if len(move_list) - index < 0:
-            return False
-
-        else:
-            # Finding the move to undo by slicing the move list with index.
-            move = move_list[len(move_list) - index]
-
-            # Extracting the info needed from move list tuple.
-            piece = move[0]
-            old_col, old_row = move[1]
-            new_col, new_row = move[2]
-            old_piece = move[3]
-
-            # Drawing the updated move on the screen.
-            screen.draw_board_navigation(chessboard.board, piece, new_col, new_row, old_col, old_row, old_piece)
-            
-    # If key is right arrow, visually redo the moves.
-    if key == pygame.K_RIGHT:
-
-        # If we are at the end of the list, return false.
-        if index == 0:
-            return False
-        else:
-            # Finding the move to undo by slicing the move list with index.
-            move = move_list[len(move_list) - index]
-
-            # Extracting the info needed from move list tuple.
-            piece = move[0]
-            new_col, new_row = move[1]
-            old_col, old_row = move[2]
-            old_piece = []
-
-            # It is important that this index is after the index call.
-            index -= 1
-
-            # Drawing the updated move on the screen.
-            screen.draw_board_navigation(chessboard.board, piece, new_col, new_row, old_col, old_row, old_piece)
-            
