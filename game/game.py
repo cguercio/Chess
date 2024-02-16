@@ -109,7 +109,7 @@ class Game:
         # self.update_capture(board, new_col, new_row)        
         return True
     
-    def in_check(self, chessboard, white_king_pos, white_king_object, black_king_pos, black_king_object):
+    def in_check(self, chessboard):
         """
         Checks both kings for check and sets check
         attribute to True if necessary.
@@ -120,6 +120,8 @@ class Game:
             b_king (object): Black king.
         """
 
+        # Finds the location of the kings on the temp board.
+        white_king_pos, white_king_object, black_king_pos, black_king_object = self.find_kings(chessboard) 
         white_king_object.in_check = False
         black_king_object.in_check = False
         
@@ -142,7 +144,9 @@ class Game:
                         black_king_object.in_check = True
                         print("black in check")
 
-    def castling(self, screen, game, piece, chessboard, new_position, original_position):
+        return white_king_object, black_king_object
+
+    def castling(self, screen, piece, chessboard, new_position, original_position):
 
         # Unpacking the move positions.
         num_cols = len(chessboard.board[0]) # Gets the number of cols by getting the length of the first list
@@ -150,15 +154,10 @@ class Game:
         old_col, old_row = original_position
         new_col, new_row = new_position
         row_diff = new_row - old_row
-        
         col_diff = new_col - old_col
-
-
-        # Finding the king locations.
-        white_king_pos, white_king_object, black_king_pos, black_king_object = game.find_kings(chessboard) 
-
+        
         # Check if the king is currently in check.
-        game.in_check(chessboard, white_king_pos, white_king_object, black_king_pos, black_king_object)
+        self.in_check(chessboard)
 
         # If king is in check when castling, disallow castling and reset attributes
         if piece.in_check == True:
@@ -190,16 +189,8 @@ class Game:
             
             chessboard.update_board(piece, (next_col, old_row), (previous_col, old_row))
             
-            # Updates the king position by one square to check for pieces controlling that square.
-            # The piece object cannot be used here because we do not update the piece attributes
-            # until the move is valid.
-            if piece.color == WHITE:
-                white_king_pos = (next_col, old_row)
-            else:
-                black_king_pos = (next_col, old_row)
-            
             # Checking to see if the new square is in check.
-            game.in_check(chessboard, white_king_pos, white_king_object, black_king_pos, black_king_object)
+            self.in_check(chessboard)
                 
             # Checks if the king is in check.
             if piece.in_check == True:
@@ -225,6 +216,7 @@ class Game:
         # Draw the rook move on the screen. 
         screen.update_move(chessboard, rook, (rook_col, old_row))
         piece.has_moved = True
+
         return True, chessboard
 
     def find_kings(self, chessboard):
@@ -248,3 +240,4 @@ class Game:
                     black_king_object = item
                     
         return white_king_pos, white_king_object, black_king_pos, black_king_object
+    

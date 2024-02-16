@@ -3,9 +3,6 @@ from constants import *
 import pygame
 
 class Player:
-    def __init__(self, turn, color):
-        self.turn = turn
-        self.color = color
 
     def move(self, pos, chessboard):
         num_cols = len(chessboard.board[0]) # Gets the number of cols by getting the length of the first list

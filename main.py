@@ -37,7 +37,7 @@ def main():
     bpawn7 = Pawn(6, 1, BLACK)
     bpawn8 = Pawn(7, 1, BLACK)
 
-    # Inititating white piece objects: qs = queens-side, ks = kings-side
+    # Initiating white piece objects: qs = queens-side, ks = kings-side
     qs_rook = Rook(0, 7, WHITE)
     qs_knight = Knight(1, 7, WHITE)
     qs_bishop = Bishop(2, 7, WHITE)
@@ -56,8 +56,8 @@ def main():
     wpawn8 = Pawn(7, 6, WHITE)
 
     # Initiating player objects
-    player_one = Player(True, WHITE)
-    player_two = Player(False, BLACK)
+    player = Player()
+
     # Initiating the game object.
     game = Game()
 
@@ -83,116 +83,59 @@ def main():
                 running = False
                 break
 
-        # Player one move loop.        
-        while player_one.turn:
-            for event in pygame.event.get():
-                # Quit pygame if escape is clicked.
-                if event.type == pygame.QUIT:
-                    player_one.turn = False
-                    player_two.turn = False
-                    running = False
-                    break
+            # Displays the beginning of the move list.
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_DOWN and len(move_list) - index > 0:
+                    screen.display_start_board(chessboard, move_list)
+                    index = len(move_list)
 
-                # Detect if user presses a keydown.
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_DOWN and len(move_list) - index > 0:
-                        screen.display_start_board(chessboard, move_list)
+                # Displays the previous move if the user presses left.
+                if event.key == pygame.K_LEFT:
+                    index += 1 # It is important that this index is before the function
+                    if len(move_list) - index >= 0:
+                        screen.display_previous_move(chessboard, move_list, index)
+                    else:
                         index = len(move_list)
-
-                    # Calls board navigation if user presses left.
-                    if event.key == pygame.K_LEFT:
-                        index += 1 # It is important that this index is before the function
-                        if len(move_list) - index >= 0:
-                            screen.display_previous_move(chessboard, move_list, index)
-                        else:
-                            index = len(move_list)
-                        
-                    # Calls board navigation if user presses right.
-                    if event.key == pygame.K_RIGHT and index > 0:
-                        screen.display_next_move(chessboard, move_list, index)
-                        index -= 1
-
-                    # Displays the current board and escapes from board navigation.
-                    if event.key == pygame.K_ESCAPE or event.key == pygame.K_UP:
-                        screen.draw_squares(square_list, WHITE, GREEN)
-                        screen.draw_pieces(chessboard)
-                        index = 0
-
-            
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse_pos = pygame.mouse.get_pos()
-                    state, piece, original_position = player_one.move(mouse_pos, chessboard)
-                    if state == True and piece.color == WHITE:
-                        wait()
-                        mouse_pos2 = pygame.mouse.get_pos()
-                        new_position = mouse_pos_to_board_pos(mouse_pos2, chessboard)
-                        old_piece = chessboard.board[new_position[0]][new_position[1]]
-                        temp_board = copy.copy(chessboard)
-                        result, next_board = valid_move(piece, old_piece, temp_board, new_position, original_position, game, screen)
-                        if result == True:
-                            chessboard.board = next_board.board
-                            screen.update_move(chessboard, piece, original_position)
-                            move_list.append((piece, new_position, original_position, old_piece))
-                            player_one.turn = False
-                            player_two.turn = True
-                            break
-                        else:
-                            print("Reset White")
-
-        while player_two.turn:
-
-            for event in pygame.event.get():
-            # Quit pygame if escape is clicked.
-                if event.type == pygame.QUIT:
-                    player_one.turn = False
-                    player_two.turn = False
-                    running = False
-                    break
-
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_DOWN and len(move_list) - index > 0:
-                        screen.display_start_board(chessboard, move_list)
-                        index = len(move_list)
-                        
-                # Calls board navigation if user presses left.
-                    if event.key == pygame.K_LEFT:
-                        index += 1 # It is important that this index is before the function
-                        if len(move_list) - index >= 0:
-                            screen.display_previous_move(chessboard, move_list, index)
-                        else:
-                            index = len(move_list)
                     
-                    # Calls board navigation if user presses right.
-                    if event.key == pygame.K_RIGHT and index > 0:
-                        screen.display_next_move(chessboard, move_list, index)
-                        index -= 1
-                    
-                    # Displays the current board and escapes from board navigation
-                    if event.key == pygame.K_ESCAPE or event.key == pygame.K_UP:
-                        screen.draw_squares(square_list, WHITE, GREEN)
-                        screen.draw_pieces(chessboard)
-                        index = 0
-            
-            
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse_pos = pygame.mouse.get_pos()
-                    state, piece, original_position = player_two.move(mouse_pos, chessboard)
-                    if state == True and piece.color == BLACK:
-                        wait()
-                        mouse_pos2 = pygame.mouse.get_pos()
-                        new_position = mouse_pos_to_board_pos(mouse_pos2, chessboard)
-                        temp_board = copy.copy(chessboard)
-                        old_piece = chessboard.board[new_position[0]][new_position[1]]
-                        result, next_board = valid_move(piece, old_piece, temp_board, new_position, original_position, game, screen)
-                        if result == True:
-                                chessboard.board = next_board.board
-                                screen.update_move(chessboard, piece, original_position)
-                                move_list.append((piece, new_position, original_position, old_piece))
-                                player_two.turn = False
-                                player_one.turn = True
-                                break
-                        else:
-                            print("Reset Black")
+                # Displays the next move if the user presses right.
+                if event.key == pygame.K_RIGHT and index > 0:
+                    screen.display_next_move(chessboard, move_list, index)
+                    index -= 1
+
+                # Displays the current board and escapes from board navigation.
+                if event.key == pygame.K_ESCAPE or event.key == pygame.K_UP:
+                    screen.draw_squares(square_list, WHITE, GREEN)
+                    screen.draw_pieces(chessboard)
+                    index = 0
+
+            move = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                state, piece, original_position = player.move(mouse_pos, chessboard)
+                # Checks if the it is whites turn and user tries to move a white piece.
+                if state == True and piece.color == WHITE and len(move_list) % 2 == 0:
+                    wait()
+                    mouse_pos2 = pygame.mouse.get_pos()
+                    move = True
+                # Checks if the it is blacks turn and user tries to move a black piece.
+                elif state == True and piece.color == BLACK and len(move_list) % 2 != 0:
+                    wait()
+                    mouse_pos2 = pygame.mouse.get_pos()
+                    move = True
+
+        # Checks if the user tried to move a piece.
+        if move == True:
+            new_position = mouse_pos_to_board_pos(mouse_pos2, chessboard)
+            old_piece = chessboard.board[new_position[0]][new_position[1]]
+            temp_board = copy.copy(chessboard)
+            result, next_board = valid_move(piece, old_piece, temp_board, new_position, original_position, game, screen)
+
+            # Checks if the move was valid and updates the board, screen, and move list.
+            if result == True:
+                chessboard.board = next_board.board
+                screen.update_move(chessboard, piece, original_position)
+                move_list.append((piece, new_position, original_position, old_piece))
+                move = False
 
 if __name__ == '__main__':
     main()

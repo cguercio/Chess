@@ -3,6 +3,7 @@
         "blit",
         "keydown",
         "MOUSEBUTTONDOWN",
+        "pygame",
         "sourcery"
     ]
 }
