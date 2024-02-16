@@ -44,3 +44,58 @@ class Board:
         col, row = piece.x, piece.y
         # Places the piece on the board.
         self.board[col][row] = piece
+
+    def update_board(self, piece, new_position, original_position):
+        # sourcery skip: class-extract-method
+        """
+        Places the piece at it's new square and clears the old square.
+
+        Args:
+            piece (object): Piece being moved.
+            new_position (tuple): The new position of the piece
+            original_position (_type_): The original position of the piece.
+        """
+        
+        old_col, old_row = original_position
+        new_col, new_row = new_position
+        
+        self.board[old_col][old_row] = []
+        self.board[new_col][new_row] = piece
+        
+    def reset_board(self, piece, new_position, original_position, old_piece=[]):
+        # sourcery skip: default-mutable-arg
+        """
+        Places the piece at it's new square and clears the old square.
+
+        Args:
+            piece (object): Piece being moved.
+            new_position (tuple): The new position of the piece
+            original_position (_type_): The original position of the piece.
+        """
+        
+        old_col, old_row = original_position
+        new_col, new_row = new_position
+        
+        self.board[old_col][old_row] = piece
+        self.board[new_col][new_row] = old_piece if old_piece != [] else []
+        
+    def reset_castling(self, piece, new_position, original_position, i):
+        """
+        Resets the king castling parameters and resets the board.
+
+        Args:
+            piece (object): Piece being moved.
+            new_position (tuple): The new position of the piece.
+            original_position (tuple): The original position of the piece.
+            i (int): Index used during castling.
+        """
+        
+        old_col, old_row = original_position
+        new_col, new_row = new_position
+        
+        piece.in_check = False
+        piece.castling = False
+        self.board[old_col][old_row] = piece
+        self.board[new_col][new_row] = []
+        self.board[old_col + i][old_row] = []
+    

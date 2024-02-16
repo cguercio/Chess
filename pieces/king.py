@@ -47,9 +47,9 @@ class King(Piece):
         if (abs(new_col - old_col) > 1 or abs(new_row - old_row) > 1):
             return False
         
-        self.has_moved = True
         return True
     
     def move(self, new_position):
         self.x, self.y = new_position
+        self.has_moved = True
         

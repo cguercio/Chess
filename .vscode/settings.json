@@ -1,6 +1,9 @@
 {
     "cSpell.words": [
+        "blit",
         "keydown",
-        "MOUSEBUTTONDOWN"
+        "MOUSEBUTTONDOWN",
+        "pygame",
+        "sourcery"
     ]
 }
