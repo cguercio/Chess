@@ -102,7 +102,7 @@ def main():
                     index -= 1
 
                 # Displays the current board and escapes from board navigation.
-                if event.key == pygame.K_ESCAPE or event.key == pygame.K_UP:
+                if event.key in [pygame.K_ESCAPE, pygame.K_UP]:
                     screen.draw_squares(square_list, WHITE, GREEN)
                     screen.draw_pieces(chessboard)
                     index = 0
@@ -144,7 +144,7 @@ def main():
                 # Updates the board and screen.
                 temp_board.board[piece.x][piece.y] = promoted_pawn
                 chessboard.board = next_board.board
-                screen.update_move(chessboard, promoted_pawn, original_position)
+                screen.update_move(chessboard, promoted_pawn, old_piece, new_position, original_position)
                 
                 move = False
                 game.move_counter += 1
@@ -154,7 +154,7 @@ def main():
                 
                 # Updates the board and screen.
                 chessboard.board = next_board.board
-                screen.update_move(chessboard, piece, original_position)
+                screen.update_move(chessboard, piece, old_piece, new_position, original_position)
                 game.move_list.append((game.move_counter, piece, new_position, original_position, old_piece))
                 
                 move = False
