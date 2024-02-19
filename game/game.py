@@ -7,6 +7,8 @@ from graphics import *
 
 
 class Game:
+    move_list = []
+    move_counter = 0
     
     # Checks if the move is blocked by another piece.
     def piece_path(self, chessboard, new_position, original_position):
@@ -208,6 +210,7 @@ class Game:
         # Update the board with rook move if castling is allowed.
         new_rook_col = new_col + col_dir_factor * -1
         chessboard.update_board(rook, (new_rook_col, new_row), (rook_col, old_row))
+        self.move_list.append((self.move_counter, rook, (new_rook_col, new_row), (rook_col, old_row), []))
         
         # Update the pieces attributes
         piece.move(new_position)
@@ -240,4 +243,5 @@ class Game:
                     black_king_object = item
                     
         return white_king_pos, white_king_object, black_king_pos, black_king_object
+    
     

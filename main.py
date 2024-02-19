@@ -20,38 +20,38 @@ def main():
     screen.draw_squares(square_list, WHITE, GREEN)
 
     # Initiating black piece objects: qs = queens-side, ks = kings-side
-    qs_rook = Rook(0, 0, BLACK)
-    qs_knight = Knight(1, 0, BLACK)
-    qs_bishop = Bishop(2, 0, BLACK)
-    b_queen = Queen(3, 0, BLACK)
+    # qs_rook = Rook(0, 0, BLACK)
+    # qs_knight = Knight(1, 0, BLACK)
+    # qs_bishop = Bishop(2, 0, BLACK)
+    # b_queen = Queen(3, 0, BLACK)
     b_king = King(4, 0, BLACK)
-    ks_bishop = Bishop(5, 0, BLACK)
+    # ks_bishop = Bishop(5, 0, BLACK)
     ks_knight = Knight(6, 0, BLACK)
-    ks_rook = Rook(7, 0, BLACK)
+    # ks_rook = Rook(7, 0, BLACK)
     bpawn1 = Pawn(0, 1, BLACK)
     bpawn2 = Pawn(1, 1, BLACK)
-    bpawn3 = Pawn(2, 1, BLACK)
-    bpawn4 = Pawn(3, 1, BLACK)
-    bpawn5 = Pawn(4, 1, BLACK)
-    bpawn6 = Pawn(5, 1, BLACK)
-    bpawn7 = Pawn(6, 1, BLACK)
-    bpawn8 = Pawn(7, 1, BLACK)
+    # bpawn3 = Pawn(2, 1, BLACK)
+    # bpawn4 = Pawn(3, 1, BLACK)
+    # bpawn5 = Pawn(4, 1, BLACK)
+    # bpawn6 = Pawn(5, 1, BLACK)
+    # bpawn7 = Pawn(6, 1, BLACK)
+    # bpawn8 = Pawn(7, 1, BLACK)
 
     # Initiating white piece objects: qs = queens-side, ks = kings-side
-    qs_rook = Rook(0, 7, WHITE)
+    # qs_rook = Rook(0, 7, WHITE)
     qs_knight = Knight(1, 7, WHITE)
-    qs_bishop = Bishop(2, 7, WHITE)
-    w_queen = Queen(3, 7, WHITE)
+    # qs_bishop = Bishop(2, 7, WHITE)
+    # w_queen = Queen(3, 7, WHITE)
     w_king = King(4, 7, WHITE)
-    ks_bishop = Bishop(5, 7, WHITE)
-    ks_knight = Knight(6, 7, WHITE)
-    ks_rook = Rook(7, 7, WHITE)
-    wpawn1 = Pawn(0, 6, WHITE)
-    wpawn2 = Pawn(1, 6, WHITE)
-    wpawn3 = Pawn(2, 6, WHITE)
-    wpawn4 = Pawn(3, 6, WHITE)
-    wpawn5 = Pawn(4, 6, WHITE)
-    wpawn6 = Pawn(5, 6, WHITE)
+    # ks_bishop = Bishop(5, 7, WHITE)
+    # ks_knight = Knight(6, 7, WHITE)
+    # ks_rook = Rook(7, 7, WHITE)
+    # wpawn1 = Pawn(0, 6, WHITE)
+    # wpawn2 = Pawn(1, 6, WHITE)
+    # wpawn3 = Pawn(2, 6, WHITE)
+    # wpawn4 = Pawn(3, 6, WHITE)
+    # wpawn5 = Pawn(4, 6, WHITE)
+    # wpawn6 = Pawn(5, 6, WHITE)
     wpawn7 = Pawn(6, 6, WHITE)
     wpawn8 = Pawn(7, 6, WHITE)
 
@@ -69,9 +69,8 @@ def main():
     # Draws the pieces at their starting squares.
     screen.draw_pieces(chessboard)
 
-    move_list = []
     index = 0
-    
+
     running = True
     while running:
 
@@ -85,21 +84,21 @@ def main():
 
             # Displays the beginning of the move list.
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_DOWN and len(move_list) - index > 0:
-                    screen.display_start_board(chessboard, move_list)
-                    index = len(move_list)
+                if event.key == pygame.K_DOWN and game.move_counter - index > 0:
+                    screen.display_start_board(chessboard, game.move_list)
+                    index = game.move_counter
 
                 # Displays the previous move if the user presses left.
                 if event.key == pygame.K_LEFT:
                     index += 1 # It is important that this index is before the function
-                    if len(move_list) - index >= 0:
-                        screen.display_previous_move(chessboard, move_list, index)
+                    if game.move_counter - index >= 0:
+                        screen.display_previous_move(chessboard, game, index)
                     else:
-                        index = len(move_list)
+                        index = game.move_counter
                     
                 # Displays the next move if the user presses right.
                 if event.key == pygame.K_RIGHT and index > 0:
-                    screen.display_next_move(chessboard, move_list, index)
+                    screen.display_next_move(chessboard, game, index)
                     index -= 1
 
                 # Displays the current board and escapes from board navigation.
@@ -113,12 +112,12 @@ def main():
                 mouse_pos = pygame.mouse.get_pos()
                 state, piece, original_position = player.move(mouse_pos, chessboard)
                 # Checks if the it is whites turn and user tries to move a white piece.
-                if state == True and piece.color == WHITE and len(move_list) % 2 == 0:
+                if state == True and piece.color == WHITE and game.move_counter % 2 == 0:
                     wait()
                     mouse_pos2 = pygame.mouse.get_pos()
                     move = True
                 # Checks if the it is blacks turn and user tries to move a black piece.
-                elif state == True and piece.color == BLACK and len(move_list) % 2 != 0:
+                elif state == True and piece.color == BLACK and game.move_counter % 2 != 0:
                     wait()
                     mouse_pos2 = pygame.mouse.get_pos()
                     move = True
@@ -129,13 +128,38 @@ def main():
             old_piece = chessboard.board[new_position[0]][new_position[1]]
             temp_board = copy.copy(chessboard)
             result, next_board = valid_move(piece, old_piece, temp_board, new_position, original_position, game, screen)
-
+            
+            # Checks if a pawn reaches the edge of the board and it was a valid move.
+            if result == True and isinstance(piece, Pawn) and piece.y in [0,7]:
+                
+                # Updates the move list with the pawn move.
+                game.move_list.append((game.move_counter, piece, new_position, original_position, old_piece))
+                
+                # Initiates the new queen object for pawn promotion.
+                promoted_pawn = Queen(piece.x, piece.y, piece.color)
+                
+                # Updates the move list with the queen move. This way the move list has all information.
+                game.move_list.append((game.move_counter, promoted_pawn, new_position, original_position, old_piece))
+                
+                # Updates the board and screen.
+                temp_board.board[piece.x][piece.y] = promoted_pawn
+                chessboard.board = next_board.board
+                screen.update_move(chessboard, promoted_pawn, original_position)
+                
+                move = False
+                game.move_counter += 1
+            
             # Checks if the move was valid and updates the board, screen, and move list.
-            if result == True:
+            elif result == True:
+                
+                # Updates the board and screen.
                 chessboard.board = next_board.board
                 screen.update_move(chessboard, piece, original_position)
-                move_list.append((piece, new_position, original_position, old_piece))
+                game.move_list.append((game.move_counter, piece, new_position, original_position, old_piece))
+                
                 move = False
+                game.move_counter += 1
+                
 
 if __name__ == '__main__':
     main()

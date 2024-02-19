@@ -115,14 +115,14 @@ class Screen:
         """
         
         for move in move_list[::-1]:
-            piece = move[0]
-            old_col, old_row = move[1]
-            new_col, new_row = move[2]
-            old_piece = move[3]
+            piece = move[1]
+            old_col, old_row = move[2]
+            new_col, new_row = move[3]
+            old_piece = move[4]
 
             self.draw_board_navigation(chessboard, piece, new_col, new_row, old_col, old_row, old_piece)
                 
-    def display_previous_move(self, chessboard, move_list, index):
+    def display_previous_move(self, chessboard, game, index):
         """
         Displays the previous move on the board.
 
@@ -132,19 +132,21 @@ class Screen:
             index (int): Index used for slicing the move list.
         """
         
-        # Finding the move to undo by slicing the move list with index.
-        move = move_list[len(move_list) - index]
+        # Iterates over the move list to find the move to undo.
+        for move in game.move_list[::-1]:
+            if move[0] == game.move_counter - index:
+                
+                # Extracting the info needed from move list tuple.
+                piece = move[1]
+                old_col, old_row = move[2]
+                new_col, new_row = move[3]
+                old_piece = move[4]
+                
+                # Drawing the updated move on the screen.
+                self.draw_board_navigation(chessboard, piece, new_col, new_row, old_col, old_row, old_piece)
 
-        # Extracting the info needed from move list tuple.
-        piece = move[0]
-        old_col, old_row = move[1]
-        new_col, new_row = move[2]
-        old_piece = move[3]
-
-        # Drawing the updated move on the screen.
-        self.draw_board_navigation(chessboard, piece, new_col, new_row, old_col, old_row, old_piece)
         
-    def display_next_move(self, chessboard, move_list, index):
+    def display_next_move(self, chessboard, game, index):
         """
         Displays the next move on the board.
 
@@ -154,20 +156,18 @@ class Screen:
             index (int): Index used for slicing the move list.
         """
         
-        # Finding the move to undo by slicing the move list with index.
-        move = move_list[len(move_list) - index]
+        # Iterates over the move list to find the move to redo.
+        for move in game.move_list:
+            if move[0] == game.move_counter - index:
 
-        # Extracting the info needed from move list tuple.
-        piece = move[0]
-        new_col, new_row = move[1]
-        old_col, old_row = move[2]
-        old_piece = []
-
-        # It is important that this index is after the index call.
-        index -= 1
-
-        # Drawing the updated move on the screen.
-        self.draw_board_navigation(chessboard, piece, new_col, new_row, old_col, old_row, old_piece)
+                # Extracting the info needed from move list tuple.
+                piece = move[1]
+                new_col, new_row = move[2]
+                old_col, old_row = move[3]
+                old_piece = []
+                    
+                # Drawing the updated move on the screen.
+                self.draw_board_navigation(chessboard, piece, new_col, new_row, old_col, old_row, old_piece)
 
     def draw_board_navigation(self, chessboard, piece, new_col, new_row, old_col, old_row, old_piece):
         """

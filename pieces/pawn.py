@@ -10,6 +10,7 @@ class Pawn(Piece):
         self.y = y
         self.color = color
         self.starting_pos = (x, y)
+        self.promotion = False
                 
         if self.color == BLACK:
             self.img = os.path.join(os.path.dirname(__file__),'..','graphics', 'b_pawn_png_shadow_100px.png')
@@ -57,8 +58,6 @@ class Pawn(Piece):
                 return False
             if self.color == BLACK and new_row - old_row < 0:
                 return False
-
-        return True
     
     def move(self, new_position):
         self.x, self.y = new_position
