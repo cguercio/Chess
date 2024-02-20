@@ -39,6 +39,14 @@ class Screen:
         pygame.display.update()
 
     def display_image(self, chessboard, piece, location):
+        """
+        Centers and displays the image of the piece on the screen
+
+        Args:
+            chessboard (list): Chessboard as a 2D list.
+            piece (object): Piece being displayed.
+            location (tuple): Location to display the piece.
+        """
         
         num_cols = len(chessboard.board[0])
         num_rows = len(chessboard.board)
@@ -53,7 +61,7 @@ class Screen:
         
     def draw_pieces(self, chessboard):
         """
-        Loops through the chessboard, finds the pieces, centers and displays the pieces.
+        Loops through the chessboard, finds the pieces, displays the pieces.
 
         Args:
             board (list): The chessboard as a 2D list
@@ -70,15 +78,17 @@ class Screen:
 
     def update_move(self, chessboard, piece, old_piece, new_position, original_position, navigation=False):
         """
-        Clears the starting square, clears the new square,
-        displays the piece on the new square.
+        Fills in the old and new squares with the correct color and calls display piece logic.
 
         Args:
-            board (list): Chessboard as a 2D list.
+            chessboard (object): Chessboard object.
             piece (object): Piece being moved.
-            original_position (tuple): Original position of the piece.
+            old_piece (object): Piece being captured if there is one.
+            new_position (tuple): New location of the piece being moved.
+            original_position (tuple): Original location of the piece being moved.
+            navigation (bool, optional): True if using board navigation option. Defaults to False.
         """
-        
+            
         # Gets the size of the board in x and y.
         num_cols = len(chessboard.board[0])
         num_rows = len(chessboard.board)
@@ -104,7 +114,7 @@ class Screen:
 
         self.display_image(chessboard, piece, (new_col, new_row))
         
-        # Loads and displays the image of the old piece if it was captured.
+        # If using board navigation and there was a piece on the board.
         if old_piece != [] and navigation == True:
             self.display_image(chessboard, old_piece, (old_col, old_row))
 

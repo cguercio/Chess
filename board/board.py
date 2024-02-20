@@ -58,9 +58,11 @@ class Board:
         
         old_col, old_row = original_position
         new_col, new_row = new_position
-        
+        captured_piece = self.board[new_col][new_row]
         self.board[old_col][old_row] = []
         self.board[new_col][new_row] = piece
+        
+        return captured_piece
         
     def reset_board(self, piece, new_position, original_position, old_piece=[]):
         # sourcery skip: default-mutable-arg

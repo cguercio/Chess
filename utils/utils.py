@@ -31,7 +31,7 @@ def mouse_pos_to_board_pos(pos, chessboard):
 
     return (int(math.floor(pos[0] // square_width)), int(math.floor(pos[1] // square_height)))
 
-def valid_move(piece, old_piece, chessboard, new_position, original_position, game, screen):
+def valid_move(piece, chessboard, new_position, original_position, game, screen):
     """
     Checks if the current move is a valid move.
 
@@ -67,39 +67,13 @@ def valid_move(piece, old_piece, chessboard, new_position, original_position, ga
     
     # Updates the temp board with the new move.
     # so we can check for checks on the king.
-    chessboard.update_board(piece, new_position, original_position)
-
-    # Checking if the kings are in check and updating their attribute.
-    white_king, black_king = game.in_check(chessboard)
+    captured_piece = chessboard.update_board(piece, new_position, original_position)
 
     # Check if the piece's king is in check, disallowing movement and resetting the board.
-    if is_in_check(piece, white_king, black_king) == True:
-        chessboard.reset_board(piece, new_position, original_position, old_piece)
+    if game.results_in_check(piece, chessboard) == True:
+        chessboard.reset_board(piece, new_position, original_position, captured_piece)
         return False, chessboard
+    
 
     piece.move(new_position)
-
     return True, chessboard
-
-def is_in_check(piece, white_king, black_king):
-    """
-    Checks if the king that belongs to the piece trying to move is in check.
-
-    Args:
-        piece (object): Piece being moved.
-        white_king (object): White king.
-        black_king (object): Black king.
-
-    Returns:
-        bool: Returns true if piece's king is in check, False if not in check.
-    """
-
-    if white_king.in_check == True and piece.color == WHITE:
-        black_king.in_check = False
-        return True
-    
-    elif black_king.in_check == True and piece.color == BLACK:
-        white_king.in_check = False
-        return True
-    
-    return False

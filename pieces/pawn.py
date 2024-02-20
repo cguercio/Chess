@@ -58,6 +58,7 @@ class Pawn(Piece):
                 return False
             if self.color == BLACK and new_row - old_row < 0:
                 return False
+        return True
     
     def move(self, new_position):
         self.x, self.y = new_position

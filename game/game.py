@@ -2,6 +2,7 @@ from pieces import *
 from constants import *
 from player import *
 from graphics import *
+from utils import *
 
 
 
@@ -78,6 +79,8 @@ class Game:
         if isinstance(chessboard.board[old_col][old_row], Pawn):
             return self.pawn_can_capture(chessboard, new_position, original_position)
         
+        self.captured_piece = (chessboard.board[new_col][new_row])
+        
         return True
         
     def pawn_can_capture(self, chessboard, new_position, original_position):
@@ -108,7 +111,6 @@ class Game:
         elif not chessboard.board[new_col][new_row] and new_col != old_col:
             return False
         
-        # self.update_capture(board, new_col, new_row)        
         return True
     
     def in_check(self, chessboard):
@@ -232,7 +234,7 @@ class Game:
         Returns:
             tuple, object: Returns king locations and objects.
         """
-        
+        print(chessboard.board)
         for col, rank in enumerate(chessboard.board):
             for row, item in enumerate(rank):
                 if isinstance(item, King) and item.color == WHITE:
@@ -244,4 +246,83 @@ class Game:
                     
         return white_king_pos, white_king_object, black_king_pos, black_king_object
     
+    def results_in_check(self, piece, chessboard):
+        """
+        Checks if the king that belongs to the piece trying to move is in check.
+
+        Args:
+            piece (object): Piece being moved.
+            chessboard (list): Chessboard as a 2D list.
+
+        Returns:
+            bool: Returns True if the move results in check, False otherwise.
+        """
+
+        # Checking if the kings are in check and updating their attribute.
+        white_king, black_king = self.in_check(chessboard)
+
+        if white_king.in_check == True and piece.color == WHITE:
+            black_king.in_check = False
+            return True
+        
+        elif black_king.in_check == True and piece.color == BLACK:
+            white_king.in_check = False
+            return True
+        
+        return False
     
+    def all_king_moves(self, king):
+        """
+        Creates a list of points around the king. This list represents
+        moves that the king can possibly make.
+
+        Args:
+            king (object): Chess piece, King.
+
+        Returns:
+            list: List of points around the king.
+        """
+        
+        cols = [-1, 0, 1]
+        rows = [-1, 0, 1]
+        king_move_list = [(king.x + col, king.y + row ) for col in cols for row in rows]
+        king_move_list.remove((king.x, king.y))
+    
+        return king_move_list
+    
+        
+    def can_king_move(self, chessboard, king):
+        """
+        Checks if the king has any valid moves.
+
+        Args:
+            chessboard (list): Chessboard as a 2D list.
+            king (object): King to be moved.
+
+        Returns:
+            bool: Returns True if the king has a valid move, False otherwise.
+        """
+        # Getting the list of points around the king.
+        king_move_list = self.all_king_moves(king)
+        
+        # Iterates through the list of points and tries to move the king.
+        for point in king_move_list:
+            
+            # Checks if the king move is valid.
+            if (king.valid_move(point, (king.x, king.y))
+                and self.can_capture(chessboard, point, (king.x, king.y))):
+                
+                # Updates the board with the new king move.
+                captured_piece = chessboard.update_board(king, point, (king.x, king.y))
+                
+                # Checks if the new king move results in check.
+                if not self.results_in_check(king, chessboard):
+                    chessboard.reset_board(king, point, (king.x, king.y), captured_piece)
+                    return True
+                
+                # Resets the board after every iteration.
+                chessboard.reset_board(king, point, (king.x, king.y), captured_piece)
+            
+        return False
+            
+            

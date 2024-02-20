@@ -9,8 +9,8 @@ class King(Piece):
         self.x = x
         self.y = y
         self.color = color
+        self.in_check = False
         self.castling = False
-        self.starting_pos = (x, y)
         self.has_moved = False
 
         if self.color == BLACK:
@@ -33,6 +33,9 @@ class King(Piece):
         
         old_col, old_row = original_position
         new_col, new_row = new_position
+        
+        if new_col > 7 or new_col < 0 or new_row > 7 or new_row < 0:
+            return False
         
         if new_col in [0, COLUMNS - 1] and abs(new_row - old_row) == 0 and self.has_moved == False:
             self.castling = True

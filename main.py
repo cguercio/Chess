@@ -20,38 +20,38 @@ def main():
     screen.draw_squares(square_list, WHITE, GREEN)
 
     # Initiating black piece objects: qs = queens-side, ks = kings-side
-    # qs_rook = Rook(0, 0, BLACK)
-    # qs_knight = Knight(1, 0, BLACK)
-    # qs_bishop = Bishop(2, 0, BLACK)
-    # b_queen = Queen(3, 0, BLACK)
+    qs_rook = Rook(0, 0, BLACK)
+    qs_knight = Knight(1, 0, BLACK)
+    qs_bishop = Bishop(2, 0, BLACK)
+    b_queen = Queen(3, 0, BLACK)
     b_king = King(4, 0, BLACK)
-    # ks_bishop = Bishop(5, 0, BLACK)
+    ks_bishop = Bishop(5, 0, BLACK)
     ks_knight = Knight(6, 0, BLACK)
-    # ks_rook = Rook(7, 0, BLACK)
+    ks_rook = Rook(7, 0, BLACK)
     bpawn1 = Pawn(0, 1, BLACK)
     bpawn2 = Pawn(1, 1, BLACK)
-    # bpawn3 = Pawn(2, 1, BLACK)
-    # bpawn4 = Pawn(3, 1, BLACK)
-    # bpawn5 = Pawn(4, 1, BLACK)
-    # bpawn6 = Pawn(5, 1, BLACK)
-    # bpawn7 = Pawn(6, 1, BLACK)
-    # bpawn8 = Pawn(7, 1, BLACK)
+    bpawn3 = Pawn(2, 1, BLACK)
+    bpawn4 = Pawn(3, 1, BLACK)
+    bpawn5 = Pawn(4, 1, BLACK)
+    bpawn6 = Pawn(5, 1, BLACK)
+    bpawn7 = Pawn(6, 1, BLACK)
+    bpawn8 = Pawn(7, 1, BLACK)
 
     # Initiating white piece objects: qs = queens-side, ks = kings-side
-    # qs_rook = Rook(0, 7, WHITE)
+    qs_rook = Rook(0, 7, WHITE)
     qs_knight = Knight(1, 7, WHITE)
-    # qs_bishop = Bishop(2, 7, WHITE)
-    # w_queen = Queen(3, 7, WHITE)
+    qs_bishop = Bishop(2, 7, WHITE)
+    w_queen = Queen(3, 7, WHITE)
     w_king = King(4, 7, WHITE)
-    # ks_bishop = Bishop(5, 7, WHITE)
-    # ks_knight = Knight(6, 7, WHITE)
-    # ks_rook = Rook(7, 7, WHITE)
-    # wpawn1 = Pawn(0, 6, WHITE)
-    # wpawn2 = Pawn(1, 6, WHITE)
-    # wpawn3 = Pawn(2, 6, WHITE)
-    # wpawn4 = Pawn(3, 6, WHITE)
-    # wpawn5 = Pawn(4, 6, WHITE)
-    # wpawn6 = Pawn(5, 6, WHITE)
+    ks_bishop = Bishop(5, 7, WHITE)
+    ks_knight = Knight(6, 7, WHITE)
+    ks_rook = Rook(7, 7, WHITE)
+    wpawn1 = Pawn(0, 6, WHITE)
+    wpawn2 = Pawn(1, 6, WHITE)
+    wpawn3 = Pawn(2, 6, WHITE)
+    wpawn4 = Pawn(3, 6, WHITE)
+    wpawn5 = Pawn(4, 6, WHITE)
+    wpawn6 = Pawn(5, 6, WHITE)
     wpawn7 = Pawn(6, 6, WHITE)
     wpawn8 = Pawn(7, 6, WHITE)
 
@@ -127,7 +127,7 @@ def main():
             new_position = mouse_pos_to_board_pos(mouse_pos2, chessboard)
             old_piece = chessboard.board[new_position[0]][new_position[1]]
             temp_board = copy.copy(chessboard)
-            result, next_board = valid_move(piece, old_piece, temp_board, new_position, original_position, game, screen)
+            result, next_board = valid_move(piece, temp_board, new_position, original_position, game, screen)
             
             # Checks if a pawn reaches the edge of the board and it was a valid move.
             if result == True and isinstance(piece, Pawn) and piece.y in [0,7]:
@@ -159,7 +159,11 @@ def main():
                 
                 move = False
                 game.move_counter += 1
-                
-
+            
+            if w_king.in_check:
+                print(game.can_king_move(chessboard, w_king))
+            elif b_king.in_check:
+                print(game.can_king_move(chessboard, b_king))
+        
 if __name__ == '__main__':
     main()
