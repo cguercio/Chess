@@ -5,7 +5,6 @@ from pieces import *
 from player import *
 from utils import *
 from game import *
-import math
 import pygame
 import copy
 

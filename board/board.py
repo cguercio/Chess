@@ -46,7 +46,6 @@ class Board:
         self.board[col][row] = piece
 
     def update_board(self, piece, new_position, original_position):
-        # sourcery skip: class-extract-method
         """
         Places the piece at it's new square and clears the old square.
 

@@ -330,10 +330,24 @@ class Game:
         return False
             
     def piece_can_block(self, chessboard, king):
+        """
+        Checks if a piece can block check,
 
+        Args:
+            chessboard (list): Chessboard as a 2D list.
+            king (object): King in check.
+
+        Returns:
+            bool: Returns True if a piece can block check, False otherwise.
+        """
+
+        # Getting the piece giving check.
         check_piece = self.check_list[0]
+        
+        # Getting the path in between the piece giving check and the king.
         check_path = self.find_path_points((check_piece.x, check_piece.y), (king.x, king.y))
         
+        # Iterates over the board to check if any pieces can block the check.
         for rank in chessboard.board:
             for piece in rank:
                 if piece != [] and not isinstance(piece, King) and piece.color == king.color:
@@ -347,8 +361,20 @@ class Game:
         return False
     
     def can_capture_check_piece(self, chessboard, king):
+        """
+        Checks if a piece can capture the piece giving check.
+
+        Args:
+            chessboard (list): Chessboard as a 2D list.
+            king (object): King in check.
+
+        Returns:
+            bool: Returns True if piece can be captured.
+        """
+        # Getting the piece giving check.
         check_piece = self.check_list[0]
         
+        # Iterates over the board to check if any pieces can capture the piece giving check.
         for rank in chessboard.board:
             for piece in rank:
                 if (piece != [] and not isinstance(piece, King) and piece.color == king.color
@@ -359,7 +385,19 @@ class Game:
         return False
     
     def is_checkmate(self, chessboard, king):
+        """
+        Checks if checkmate is on the board.
+
+        Args:
+            chessboard (list): Chessboard as a 2D list.
+            king (object): King in check.
+
+        Returns:
+            bool: Returns True if checkmate is on the board, False otherwise.
+        """
         
+        # If check list has two pieces in it, king is in double check.
+        # If king is in double check, only king move is checked.
         if (len(self.check_list) > 1
         and not self.king_can_move(chessboard, king)):
             return True
