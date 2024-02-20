@@ -224,7 +224,7 @@ class Game:
         rook.move((new_col + col_dir_factor * -1, old_row))
 
         # Draw the rook move on the screen. 
-        screen.update_move(chessboard, rook, (rook_col, old_row))
+        screen.update_move(chessboard, rook, [], (new_rook_col, new_row), (rook_col, old_row))
         piece.has_moved = True
 
         return True, chessboard
