@@ -9,23 +9,23 @@ from utils import *
 
 class Game:
     move_list = []
+    check_list = []
     move_counter = 0
     
     # Checks if the move is blocked by another piece.
-    def piece_path(self, chessboard, new_position, original_position):
+    def find_path_points(self, position1, position2):
         """
-        Checks if a move is valid for a given chess piece on the board.
+        Builds a list of points in between two locations on the board.
 
         Args:
-            board (list): The chessboard as a 2D list
-            piece (object): The chess piece to be moved.
-            original_position (tuple): The original position of the piece.
+            position1 (tuple): (x, y).
+            position2 (tuple): (x, y).
 
         Returns:
-            Boolean: True if move is valid, False otherwise.
+            list: List of tuples containing x and y values.
         """
-        old_col, old_row = original_position
-        new_col, new_row = new_position
+        new_col, new_row = position1
+        old_col, old_row = position2
         num_points = max(abs(new_col - old_col), abs(new_row - old_row))
 
         # Builds a list of x points in between the original piece position
@@ -44,16 +44,20 @@ class Game:
         elif new_row - old_row > 0:
             y_points = [y for y in range(old_row + 1, new_row)]
         else:
-            y_points =[y for y in range(old_row - 1, new_row, -1)]
+            y_points = [y for y in range(old_row - 1, new_row, -1)]
 
-        # Combines the x and y lists into a list of points.
-        piece_path = list(zip(x_points, y_points))
+        
+        return list(zip(x_points, y_points))
+    
+    def piece_in_path(self, chessboard, new_position, original_position):
+        
+        piece_path = self.find_path_points(new_position, original_position)
         
         for point in piece_path:
             if chessboard.board[point[0]][point[1]] != []:
-                return False
-
-        return True
+                return True
+            
+        return False
     
     def can_capture(self, chessboard, new_position, original_position):
         """
@@ -79,7 +83,6 @@ class Game:
         if isinstance(chessboard.board[old_col][old_row], Pawn):
             return self.pawn_can_capture(chessboard, new_position, original_position)
         
-        self.captured_piece = (chessboard.board[new_col][new_row])
         
         return True
         
@@ -136,16 +139,18 @@ class Game:
                     original_position = (col, row)
                     # Trying to move all black pieces to the white king.
                     if (piece.color == BLACK and piece.valid_move(white_king_pos, original_position) == True
-                        and self.piece_path(chessboard, white_king_pos, original_position) == True
+                        and self.piece_in_path(chessboard, white_king_pos, original_position) == False
                         and self.can_capture(chessboard, white_king_pos, original_position) == True):
                         print("white in check")
+                        self.check_list.append(piece)
                         white_king_object.in_check = True
 
                     # Trying to move all white pieces to the black king.
                     elif (piece.color == WHITE and piece.valid_move(black_king_pos, original_position) == True
-                        and self.piece_path(chessboard, black_king_pos, original_position) == True
+                        and self.piece_in_path(chessboard, black_king_pos, original_position) == False
                         and self.can_capture(chessboard, black_king_pos, original_position) == True):
                         black_king_object.in_check = True
+                        self.check_list.append(piece)
                         print("black in check")
 
         return white_king_object, black_king_object
@@ -219,7 +224,7 @@ class Game:
         rook.move((new_col + col_dir_factor * -1, old_row))
 
         # Draw the rook move on the screen. 
-        screen.update_move(chessboard, rook, (rook_col, old_row))
+        screen.update_move(chessboard, rook, [], (new_rook_col, new_row), (rook_col, old_row))
         piece.has_moved = True
 
         return True, chessboard
@@ -234,7 +239,6 @@ class Game:
         Returns:
             tuple, object: Returns king locations and objects.
         """
-        print(chessboard.board)
         for col, rank in enumerate(chessboard.board):
             for row, item in enumerate(rank):
                 if isinstance(item, King) and item.color == WHITE:
@@ -291,7 +295,7 @@ class Game:
         return king_move_list
     
         
-    def can_king_move(self, chessboard, king):
+    def king_can_move(self, chessboard, king):
         """
         Checks if the king has any valid moves.
 
@@ -325,4 +329,43 @@ class Game:
             
         return False
             
-            
+    def piece_can_block(self, chessboard, king):
+
+        check_piece = self.check_list[0]
+        check_path = self.find_path_points((check_piece.x, check_piece.y), (king.x, king.y))
+        
+        for rank in chessboard.board:
+            for piece in rank:
+                if piece != [] and not isinstance(piece, King) and piece.color == king.color:
+                    for point in check_path:
+                        if (piece.valid_move(point, (piece.x, piece.y))
+                        and not self.piece_in_path(chessboard, point, (piece.x, piece.y))
+                        and self.can_capture(chessboard, point,(piece.x, piece.y))):
+                            print("not mate")
+                            return True
+                        
+        return False
+    
+    def can_capture_check_piece(self, chessboard, king):
+        check_piece = self.check_list[0]
+        
+        for rank in chessboard.board:
+            for piece in rank:
+                if (piece != [] and not isinstance(piece, King) and piece.color == king.color
+                and piece.valid_move((check_piece.x, check_piece.y), (piece.x, piece.y))
+                and self.can_capture(chessboard, (check_piece.x, check_piece.y), (piece.x, piece.y))):
+                    return True
+
+        return False
+    
+    def is_checkmate(self, chessboard, king):
+        
+        if (len(self.check_list) > 1
+        and not self.king_can_move(chessboard, king)):
+            return True
+        elif (not self.king_can_move(chessboard, king)
+        and not self.piece_can_block(chessboard, king)
+        and not self.can_capture_check_piece(chessboard, king)):
+            return True
+        
+        return False

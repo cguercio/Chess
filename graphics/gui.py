@@ -109,7 +109,7 @@ class Screen:
         # Color the new square with the correct color. 
         # This clears the square of any pieces that are on that square.
         fill_color = WHITE if (new_col + new_row) % 2 == 0 else GREEN
-        self.win.fill(fill_color, (new_col * square_width,new_row * square_height,
+        self.win.fill(fill_color, (new_col * square_width, new_row * square_height,
                                             square_width, square_height))
 
         self.display_image(chessboard, piece, (new_col, new_row))

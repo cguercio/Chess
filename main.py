@@ -126,6 +126,8 @@ def main():
         if move == True:
             new_position = mouse_pos_to_board_pos(mouse_pos2, chessboard)
             old_piece = chessboard.board[new_position[0]][new_position[1]]
+            if old_piece != [] and old_piece.color == piece.color:
+                old_piece = []
             temp_board = copy.copy(chessboard)
             result, next_board = valid_move(piece, temp_board, new_position, original_position, game, screen)
             
@@ -154,16 +156,19 @@ def main():
                 
                 # Updates the board and screen.
                 chessboard.board = next_board.board
-                screen.update_move(chessboard, piece, old_piece, new_position, original_position)
-                game.move_list.append((game.move_counter, piece, new_position, original_position, old_piece))
+                screen.update_move(chessboard, piece, old_piece, (piece.x, piece.y), original_position)
+                game.move_list.append((game.move_counter, piece, (piece.x, piece.y), original_position, old_piece))
                 
                 move = False
                 game.move_counter += 1
             
-            if w_king.in_check:
-                print(game.can_king_move(chessboard, w_king))
-            elif b_king.in_check:
-                print(game.can_king_move(chessboard, b_king))
+            if w_king.in_check and game.is_checkmate(chessboard, w_king):
+                print("Game Over! Black Wins!")
+            
+            elif b_king.in_check and game.is_checkmate(chessboard, b_king):
+                print("Game Over! White Wins!")
+                    
+            game.check_list = []
         
 if __name__ == '__main__':
     main()
