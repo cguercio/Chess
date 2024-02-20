@@ -52,7 +52,7 @@ def valid_move(piece, chessboard, new_position, original_position, game, screen)
     if piece.valid_move(new_position, original_position) == False:
         print("1")
         return False, chessboard
-    if game.piece_path(chessboard, new_position, original_position) == False:
+    if game.piece_in_path(chessboard, new_position, original_position):
         print("2")
         return False, chessboard
     if isinstance(piece, King) and piece.castling == True:
