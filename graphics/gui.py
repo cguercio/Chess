@@ -36,7 +36,7 @@ class Screen:
                 self.win.fill(fill_color, (point[0], point[1],
                                             square_width, square_height))
 
-        pygame.display.update()
+        # pygame.display.update()
 
     def display_image(self, chessboard, piece, location):
         """
@@ -59,7 +59,7 @@ class Screen:
         y_pos = row * HEIGHT // num_rows + img_offset_y
         self.win.blit(img, (x_pos, y_pos))
         
-    def draw_pieces(self, chessboard):
+    def draw_pieces(self, chessboard, omit=None):
         """
         Loops through the chessboard, finds the pieces, displays the pieces.
 
@@ -70,11 +70,9 @@ class Screen:
         # Loops through the board and finds the pieces.
         for row in chessboard.board:
             for piece in row:
-                if isinstance(piece, Piece):
+                if isinstance(piece, Piece) and omit != piece:
                     self.display_image(chessboard, piece, (piece.x, piece.y))
 
-        pygame.display.update()
-        
 
     def update_move(self, chessboard, piece, old_piece, new_position, original_position, navigation=False):
         """
@@ -184,3 +182,37 @@ class Screen:
                     
                 # Drawing the updated move on the screen.
                 self.update_move(chessboard, piece, old_piece, (new_col, new_row), (old_col, old_row), True)
+                
+    def draw_on_mouse(self, chessboard, piece, square_list):
+        
+        location = pygame.mouse.get_pos()
+        col, row = location
+        
+        # Gets the size of the board in x and y.
+        num_cols = len(chessboard.board[0])
+        num_rows = len(chessboard.board)
+
+        # Calculating the height and width of the squares.
+        square_width = self.width // num_cols
+        square_height = self.height // num_rows
+        
+        # Color the piece original square with the correct color.
+        fill_color = WHITE if (piece.x + piece.y) % 2 == 0 else GREEN
+        self.win.fill(fill_color, (piece.x * square_width, piece.y * square_height,
+                                            square_width, square_height))
+        
+        img = pygame.image.load(piece.img)
+        img_offset_x = img.get_width() // 2
+        img_offset_y = img.get_height() // 2
+        x_pos = col - img_offset_x
+        y_pos = row - img_offset_y
+        piece_surface = pygame.Surface((img.get_width(), img.get_height()), pygame.SRCALPHA)
+        
+        self.draw_squares(square_list, WHITE, GREEN)
+        self.draw_pieces(chessboard, piece)
+        
+        piece_surface.blit(img, (0, 0))
+        self.win.blit(piece_surface, (x_pos, y_pos))
+        
+        pygame.display.flip()
+        

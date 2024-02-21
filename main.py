@@ -67,6 +67,7 @@ def main():
 
     # Draws the pieces at their starting squares.
     screen.draw_pieces(chessboard)
+    pygame.display.update()
 
     index = 0
 
@@ -104,12 +105,35 @@ def main():
                 if event.key in [pygame.K_ESCAPE, pygame.K_UP]:
                     screen.draw_squares(square_list, WHITE, GREEN)
                     screen.draw_pieces(chessboard)
+                    pygame.display.update()
                     index = 0
 
             move = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 state, piece, original_position = player.move(mouse_pos, chessboard)
+                
+                if (state == True and piece.color == WHITE and game.move_counter % 2 == 0
+                    or state == True and piece.color == BLACK and game.move_counter % 2 != 0):
+                    mouse_down = True
+                    
+                    while mouse_down:
+                        clock.tick(FPS)
+                        
+                        screen.draw_on_mouse(chessboard, piece, square_list)
+                        
+                        for event in pygame.event.get():
+                            if event.type == pygame.MOUSEBUTTONUP:
+                                screen.draw_squares(square_list, WHITE, GREEN)
+                                screen.draw_pieces(chessboard)
+                                pygame.display.flip()
+                                mouse_pos2 = pygame.mouse.get_pos()
+                                print(mouse_pos2)
+                                move = True
+                                mouse_down = False
+                                break
+                            
+            if event.type == pygame.MOUSEBUTTONDOWN and move == False:
                 # Checks if the it is whites turn and user tries to move a white piece.
                 if state == True and piece.color == WHITE and game.move_counter % 2 == 0:
                     wait()
@@ -124,6 +148,7 @@ def main():
         # Checks if the user tried to move a piece.
         if move == True:
             new_position = mouse_pos_to_board_pos(mouse_pos2, chessboard)
+            print(new_position)
             old_piece = chessboard.board[new_position[0]][new_position[1]]
             if old_piece != [] and old_piece.color == piece.color:
                 old_piece = []
@@ -160,6 +185,11 @@ def main():
                 
                 move = False
                 game.move_counter += 1
+            
+            elif result == False:
+                screen.draw_squares(square_list, WHITE, GREEN)
+                screen.draw_pieces(chessboard)
+                pygame.display.update()
             
             if w_king.in_check and game.is_checkmate(chessboard, w_king):
                 print("Game Over! Black Wins!")
