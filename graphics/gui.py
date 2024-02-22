@@ -1,6 +1,7 @@
 import pygame
 from constants import *
 from pieces import *
+import os
 pygame.init()
 pygame.font.init()
 
@@ -11,6 +12,20 @@ class Screen:
         self.height = HEIGHT
         self.win = pygame.display.set_mode((self.width, self.height))
 
+    def get_promotion_images(self, piece):
+        
+        if piece.color == BLACK:
+            promotion_imgs = [os.path.join(os.path.dirname(__file__),'..','graphics', 'b_queen_png_shadow_100px.png'),
+                            os.path.join(os.path.dirname(__file__),'..','graphics', 'b_rook_png_shadow_100px.png'),
+                            os.path.join(os.path.dirname(__file__),'..','graphics', 'b_bishop_png_shadow_100px.png'),
+                            os.path.join(os.path.dirname(__file__),'..','graphics', 'b_knight_png_shadow_100px.png')]
+        elif piece.color  == WHITE:
+            promotion_imgs = [os.path.join(os.path.dirname(__file__),'..','graphics', 'w_queen_png_shadow_100px.png'),
+                            os.path.join(os.path.dirname(__file__),'..','graphics', 'w_rook_png_shadow_100px.png'),
+                            os.path.join(os.path.dirname(__file__),'..','graphics', 'w_bishop_png_shadow_100px.png'),
+                            os.path.join(os.path.dirname(__file__),'..','graphics', 'w_knight_png_shadow_100px.png')]
+
+        return promotion_imgs
 
     # Method takes in a list of lists of points and uses it to draw a checkered pattern.
     # This method works with any size grid
@@ -216,3 +231,34 @@ class Screen:
         
         pygame.display.flip()
         
+    def display_promotion(self, piece, board):
+        
+        num_cols = len(board.board[0])
+        num_rows = len(board.board)
+        promotion_imgs = self.get_promotion_images(piece)
+        square_width = self.width // num_cols
+        square_height = self.height // num_rows
+        
+        # Color the piece original square with the correct color.
+        fill_color = WHITE if (piece.x + piece.y) % 2 == 0 else GREEN
+        self.win.fill(fill_color, (piece.x * square_width, piece.y * square_height,
+                                            square_width, square_height))
+        
+        if piece.color == WHITE:
+            step = [0, 1, 2, 3]
+        else:
+            step = [0, -1, -2, -3]
+            
+        for i, num in enumerate(step):
+            col = piece.x
+            row = piece.y + num
+            img = pygame.image.load(promotion_imgs[i])
+            img_offset_x = (WIDTH // num_cols - img.get_width()) // 2 + 2
+            img_offset_y = (HEIGHT // num_rows - img.get_height()) // 2 + 2
+            x_pos = col * WIDTH // num_cols + img_offset_x
+            y_pos = row * HEIGHT // num_rows + img_offset_y
+            piece_surface = pygame.Surface((img.get_width(), img.get_height()), pygame.SRCALPHA)
+            
+            piece_surface.blit(img, (0, 0))
+            self.win.blit(piece_surface, (x_pos, y_pos))
+        pygame.display.flip()
