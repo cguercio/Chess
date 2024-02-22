@@ -6,11 +6,14 @@ from game import *
 from graphics import *
 
 
-def wait():
+def mouse_click():
     while True:
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
-                return
+                if event.button == 1:
+                    return True
+                if event.button == 3:
+                    return False
             
 def mouse_pos_to_board_pos(pos, chessboard):
     """
@@ -74,6 +77,6 @@ def valid_move(piece, chessboard, new_position, original_position, game, screen)
         chessboard.reset_board(piece, new_position, original_position, captured_piece)
         return False, chessboard
     
-
     piece.move(new_position)
+
     return True, chessboard

@@ -23,3 +23,17 @@ class Player:
                     return True, piece, original_position
 
         return False, piece, original_position
+    
+    def click_square(self, pos, board, location):
+        
+        num_cols = len(board.board[0]) # Gets the number of cols by getting the length of the first list
+        num_rows = len(board.board) # Gets the number of rows by getting the number of lists
+        square_width = WIDTH // num_cols
+        square_height = HEIGHT // num_rows
+        col, row = location
+        
+        if (pos[0] > col * square_width 
+            and pos[0] < col * square_width + square_width 
+            and pos[1] > row * square_height 
+            and pos[1] < row * square_height + square_height):
+            return True
