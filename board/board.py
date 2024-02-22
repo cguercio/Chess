@@ -10,7 +10,6 @@ class Board:
         self.y_squares = y_squares
         self.board = [[[] for _ in range(x_squares)] for _ in range(y_squares)]
 
-    # Method builds a list of lists of points for squares to be drawn
     def squares(self):
         """
         Returns a list of lists representing the coordinates of each square on the chessboard.
@@ -41,10 +40,12 @@ class Board:
             None
         
         """
-        col, row = piece.x, piece.y
-        # Places the piece on the board.
-        self.board[col][row] = piece
 
+        col, row = piece.x, piece.y
+
+        if col is not None and row is not None:
+            self.board[col][row] = piece
+        
     def update_board(self, piece, new_position, original_position):
         """
         Places the piece at it's new square and clears the old square.

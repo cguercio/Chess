@@ -1,4 +1,4 @@
-from pieces import Piece
+from pieces.pieces import Piece
 from constants import *
 import math
 import os

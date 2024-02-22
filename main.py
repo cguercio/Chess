@@ -85,7 +85,7 @@ def main():
             # Displays the beginning of the move list.
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_DOWN and game.move_counter - index > 0:
-                    screen.display_start_board(chessboard, game.move_list)
+                    screen.display_start_board(chessboard, game)
                     index = game.move_counter
 
                 # Displays the previous move if the user presses left.
