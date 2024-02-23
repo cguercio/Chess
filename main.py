@@ -174,7 +174,7 @@ def main():
                 result, next_board = valid_move(piece, temp_board, new_position, original_position, game, screen)
                 
                 # Checks if a pawn reaches the edge of the board and it was a valid move.
-                if result == True and isinstance(piece, Pawn) and piece.y in [0,7]:
+                if result == True and isinstance(piece, Pawn) and piece.row in [0,7]:
                     
                     # Updates the move list with the pawn move.
                     
@@ -197,7 +197,7 @@ def main():
                         game.move_list.append((game.move_counter, promoted_pawn, new_position, original_position, old_piece))
                         
                         # Updates the board and screen.
-                        temp_board.board[piece.x][piece.y] = promoted_pawn
+                        temp_board.board[piece.col][piece.row] = promoted_pawn
                         chessboard.board = next_board.board
                         screen.draw_squares(square_list, WHITE, GREEN)
                         screen.draw_pieces(chessboard)
@@ -215,7 +215,7 @@ def main():
                     screen.draw_squares(square_list, WHITE, GREEN)
                     screen.draw_pieces(chessboard)
                     pygame.display.flip()
-                    game.move_list.append((game.move_counter, piece, (piece.x, piece.y), original_position, old_piece))
+                    game.move_list.append((game.move_counter, piece, (piece.col, piece.row), original_position, old_piece))
                     
                     move = False
                     game.move_counter += 1

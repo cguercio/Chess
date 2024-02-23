@@ -52,7 +52,7 @@ def valid_move(piece, chessboard, new_position, original_position, game, screen)
     new_col, new_row = new_position
     
     # Runs different checks for valid moves.
-    if piece.valid_move(new_position, original_position) == False:
+    if piece.is_valid_move(new_position, original_position) == False:
         print("1")
         return False, chessboard
     if game.piece_in_path(chessboard, new_position, original_position):

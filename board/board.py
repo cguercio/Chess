@@ -21,9 +21,11 @@ class Board:
             A list of lists, where each inner list contains the (x, y) coordinates of a square.
 
         """
+        # Calculating square height and width.
         square_width = WIDTH // self.x_squares
         square_height = HEIGHT // self.y_squares
 
+        # Returns a list of lists representing the board.
         return [
             [(x, y) for x in range(0, WIDTH, square_width)]
             for y in range(0, HEIGHT, square_height)]
@@ -41,8 +43,9 @@ class Board:
         
         """
 
-        col, row = piece.x, piece.y
+        col, row = piece.col, piece.row
 
+        # Set the pieces at their locations on the board.
         if col is not None and row is not None:
             self.board[col][row] = piece
         
@@ -56,16 +59,20 @@ class Board:
             original_position (_type_): The original position of the piece.
         """
         
+        # Unpacking the location tuples.
         old_col, old_row = original_position
         new_col, new_row = new_position
+
+        # Setting "captured_piece" to the new board position
         captured_piece = self.board[new_col][new_row]
+
+        # Clear the piece old square and set it at its new square.
         self.board[old_col][old_row] = []
         self.board[new_col][new_row] = piece
         
         return captured_piece
         
     def reset_board(self, piece, new_position, original_position, old_piece=[]):
-        # sourcery skip: default-mutable-arg
         """
         Places the piece at it's new square and clears the old square.
 
@@ -75,11 +82,13 @@ class Board:
             original_position (_type_): The original position of the piece.
         """
         
+        # Unpacking the location tuples.
         old_col, old_row = original_position
         new_col, new_row = new_position
         
+        # Put the old piece back to its original location put the old piece back.
         self.board[old_col][old_row] = piece
-        self.board[new_col][new_row] = old_piece if old_piece != [] else []
+        self.board[new_col][new_row] = old_piece
         
     def reset_castling(self, piece, new_position, original_position, i):
         """
@@ -91,12 +100,15 @@ class Board:
             original_position (tuple): The original position of the piece.
             i (int): Index used during castling.
         """
-        
+        # Unpacking the location tuples.
         old_col, old_row = original_position
         new_col, new_row = new_position
         
+        # Reset the castling attributes.
         piece.in_check = False
         piece.castling = False
+
+        # Reset the board.
         self.board[old_col][old_row] = piece
         self.board[new_col][new_row] = []
         self.board[old_col + i][old_row] = []

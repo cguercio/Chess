@@ -138,7 +138,7 @@ class Game:
                 if piece != []:
                     original_position = (col, row)
                     # Trying to move all black pieces to the white king.
-                    if (piece.color == BLACK and piece.valid_move(white_king_pos, original_position) == True
+                    if (piece.color == BLACK and piece.is_valid_move(white_king_pos, original_position) == True
                         and self.piece_in_path(chessboard, white_king_pos, original_position) == False
                         and self.can_capture(chessboard, white_king_pos, original_position) == True):
                         print("white in check")
@@ -146,7 +146,7 @@ class Game:
                         white_king_object.in_check = True
 
                     # Trying to move all white pieces to the black king.
-                    elif (piece.color == WHITE and piece.valid_move(black_king_pos, original_position) == True
+                    elif (piece.color == WHITE and piece.is_valid_move(black_king_pos, original_position) == True
                         and self.piece_in_path(chessboard, black_king_pos, original_position) == False
                         and self.can_capture(chessboard, black_king_pos, original_position) == True):
                         black_king_object.in_check = True
@@ -345,16 +345,16 @@ class Game:
         check_piece = self.check_list[0]
         
         # Getting the path in between the piece giving check and the king.
-        check_path = self.find_path_points((check_piece.x, check_piece.y), (king.x, king.y))
+        check_path = self.find_path_points((check_piece.col, check_piece.row), (king.x, king.y))
         
         # Iterates over the board to check if any pieces can block the check.
         for rank in chessboard.board:
             for piece in rank:
                 if piece != [] and not isinstance(piece, King) and piece.color == king.color:
                     for point in check_path:
-                        if (piece.valid_move(point, (piece.x, piece.y))
-                        and not self.piece_in_path(chessboard, point, (piece.x, piece.y))
-                        and self.can_capture(chessboard, point,(piece.x, piece.y))):
+                        if (piece.is_valid_move(point, (piece.col, piece.row))
+                        and not self.piece_in_path(chessboard, point, (piece.col, piece.row))
+                        and self.can_capture(chessboard, point,(piece.col, piece.row))):
                             print("not mate")
                             return True
                         
@@ -378,8 +378,8 @@ class Game:
         for rank in chessboard.board:
             for piece in rank:
                 if (piece != [] and not isinstance(piece, King) and piece.color == king.color
-                and piece.valid_move((check_piece.x, check_piece.y), (piece.x, piece.y))
-                and self.can_capture(chessboard, (check_piece.x, check_piece.y), (piece.x, piece.y))):
+                and piece.is_valid_move((check_piece.col, check_piece.row), (piece.col, piece.row))
+                and self.can_capture(chessboard, (check_piece.col, check_piece.row), (piece.col, piece.row))):
                     return True
 
         return False
@@ -415,12 +415,12 @@ class Game:
             step = [0, -1, -2, -3]
 
         for num in step:
-            if player.click_square(pos, chessboard, (piece.x, piece.y + num)):
+            if player.click_square(pos, chessboard, (piece.col, piece.row + num)):
                 if num == 0:
-                    return Queen(piece.x, piece.y, piece.color)
+                    return Queen(piece.col, piece.row, piece.color)
                 elif num in [-1, 1]:
-                    return Rook(piece.x, piece.y, piece.color)
+                    return Rook(piece.col, piece.row, piece.color)
                 elif num in [-2, 2]:
-                    return Bishop(piece.x, piece.y, piece.color)
+                    return Bishop(piece.col, piece.row, piece.color)
                 elif num in [-3, 3]:
-                    return Knight(piece.x, piece.y, piece.color)
+                    return Knight(piece.col, piece.row, piece.color)

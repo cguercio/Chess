@@ -14,12 +14,12 @@ class Player:
         
         for row in chessboard.board:
             for piece in row:
-                if (isinstance(piece, Piece) and (pos[0] > piece.x * square_width 
-                                                  and pos[0] < piece.x * square_width + square_width 
-                                                  and pos[1] > piece.y * square_height 
-                                                  and pos[1] < piece.y * square_height + square_height)):
+                if (isinstance(piece, Piece) and (pos[0] > piece.col * square_width 
+                                                  and pos[0] < piece.col * square_width + square_width 
+                                                  and pos[1] > piece.row * square_height 
+                                                  and pos[1] < piece.row * square_height + square_height)):
                     
-                    original_position = (piece.x, piece.y)
+                    original_position = (piece.col, piece.row)
                     return True, piece, original_position
 
         return False, piece, original_position

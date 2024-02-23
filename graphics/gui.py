@@ -81,7 +81,7 @@ class Screen:
                 is_not_omitted_piece = omit != piece
                 
                 if isinstance(piece, Piece) and is_not_omitted_piece:
-                    self.display_image(board, piece, (piece.x, piece.y))
+                    self.display_image(board, piece, (piece.col, piece.row))
                     
     def clear_squares(self, board, locations):
         """
@@ -286,7 +286,7 @@ class Screen:
         promotion_pieces = piece.get_promotion_pieces(piece)
         
         # Clear the piece starting square.
-        self.clear_squares(board, [(piece.x, piece.y)])
+        self.clear_squares(board, [(piece.col, piece.row)])
 
         # Sets the step list so images are displayed at the correct locations
         # depending on if its white or black promoting.
@@ -300,8 +300,8 @@ class Screen:
         for i, num in enumerate(step):
             
             # Getting location for piece images to be displayed.
-            col = piece.x
-            row = piece.y + num
+            col = piece.col
+            row = piece.row + num
             
             promotion_piece = promotion_pieces[i]
             self.display_image(board, promotion_piece, (col, row))

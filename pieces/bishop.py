@@ -1,21 +1,21 @@
 from pieces.pieces import Piece
 from constants import *
-import math
 import os
 
 class Bishop(Piece):
-    def __init__(self, x, y, color):
-        super().__init__(x, y, color)
-        self.x = x
-        self.y = y
+    def __init__(self, col, row, color):
+        super().__init__(col, row, color)
+        self.col = col
+        self.row = row
         self.color = color
 
+        # If color attribute is black, set img attribute to white piece png. White otherwise.
         if self.color == BLACK:
             self.img = os.path.join(os.path.dirname(__file__),'..','graphics', 'b_bishop_png_shadow_100px.png')
         elif self.color  == WHITE:
             self.img = os.path.join(os.path.dirname(__file__),'..','graphics', 'w_bishop_png_shadow_100px.png')
 
-    def valid_move(self, new_position, original_position):
+    def is_valid_move(self, new_position, original_position):
         """
         Checks that the bishop moves only on diagonals.
 
@@ -27,14 +27,16 @@ class Bishop(Piece):
             boolean: True if move is valid, False otherwise.
         """
         
+        # Unpacking location tuples.
         old_col, old_row = original_position
         new_col, new_row = new_position
+
+        # The row and column difference are not equal if piece doesn't move on a diagonal.
+        not_on_diagonal = (abs(new_col - old_col) != abs(new_row - old_row))
         
         # Checks that the bishop only moves on a diagonal.
-        if (abs(new_col - old_col) != abs(new_row - old_row)):
+        if not_on_diagonal:
             return False
 
         return True
     
-    def move(self, new_position):
-        self.x, self.y = new_position
