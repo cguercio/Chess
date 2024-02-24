@@ -289,8 +289,8 @@ class Game:
         
         cols = [-1, 0, 1]
         rows = [-1, 0, 1]
-        king_move_list = [(king.x + col, king.y + row ) for col in cols for row in rows]
-        king_move_list.remove((king.x, king.y))
+        king_move_list = [(king.col + col, king.row + row ) for col in cols for row in rows]
+        king_move_list.remove((king.col, king.row))
     
         return king_move_list
     
@@ -313,19 +313,19 @@ class Game:
         for point in king_move_list:
             
             # Checks if the king move is valid.
-            if (king.valid_move(point, (king.x, king.y))
-                and self.can_capture(chessboard, point, (king.x, king.y))):
+            if (king.is_valid_move(point, (king.col, king.row))
+                and self.can_capture(chessboard, point, (king.col, king.row))):
                 
                 # Updates the board with the new king move.
-                captured_piece = chessboard.update_board(king, point, (king.x, king.y))
+                captured_piece = chessboard.update_board(king, point, (king.col, king.row))
                 
                 # Checks if the new king move results in check.
                 if not self.results_in_check(king, chessboard):
-                    chessboard.reset_board(king, point, (king.x, king.y), captured_piece)
+                    chessboard.reset_board(king, point, (king.col, king.row), captured_piece)
                     return True
                 
                 # Resets the board after every iteration.
-                chessboard.reset_board(king, point, (king.x, king.y), captured_piece)
+                chessboard.reset_board(king, point, (king.col, king.row), captured_piece)
             
         return False
             
@@ -345,7 +345,7 @@ class Game:
         check_piece = self.check_list[0]
         
         # Getting the path in between the piece giving check and the king.
-        check_path = self.find_path_points((check_piece.col, check_piece.row), (king.x, king.y))
+        check_path = self.find_path_points((check_piece.col, check_piece.row), (king.col, king.row))
         
         # Iterates over the board to check if any pieces can block the check.
         for rank in chessboard.board:
