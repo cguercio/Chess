@@ -17,6 +17,14 @@ class King(Piece):
             self.img = os.path.join(os.path.dirname(__file__),'..','graphics', 'b_king_png_shadow_100px.png')
         elif self.color  == WHITE:
             self.img = os.path.join(os.path.dirname(__file__),'..','graphics', 'w_king_png_shadow_100px.png')
+        
+        # Set king positions when the king castles.
+        if self.color == BLACK:
+            self.castle_left = (2, 0)
+            self.castle_right = (6, 0)
+        elif self.color == WHITE:
+            self.castle_left = (2, 7)
+            self.castle_right = (6, 7)
 
     def is_valid_move(self, new_position, original_position):
         """

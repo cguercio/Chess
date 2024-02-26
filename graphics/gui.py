@@ -22,14 +22,12 @@ class Screen:
             color2 (RGB): Second color to draw.
         """
 
-        # Getting the number of columns and rows.
-        num_cols = len(point_list[0])
+        # Getting the number of rows.
         num_rows = len(point_list)
+        point1 = point_list[0][0]
+        point2 = point_list[0][1]
         
-        # Getting the width of the columns and rows.
-        square_width = self.width // num_cols
-        square_height = self.height // num_rows
-        
+        square_size = abs(point1[0] - point2[0])
         
         # Iterates over the list of points and fills in the checkered pattern.
         for row in range(num_rows):
@@ -41,7 +39,7 @@ class Screen:
                 
                 fill_color = color1 if row_plus_col_is_even else color2
                 self.win.fill(fill_color, (rect_x, rect_y,
-                                            square_width, square_height))
+                                            square_size, square_size))
 
     def display_image(self, board, piece, location):
         """

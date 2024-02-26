@@ -6,12 +6,14 @@ import math
 class Board:
     board_list = []
 
-    def __init__(self, cols, rows):
+    def __init__(self, cols, rows, width, height):
         self.cols = cols
         self.rows = rows
+        self.width = width
+        self.height = height
         self.board = [[[] for _ in range(cols)] for _ in range(rows)]
-        self.square_width = WIDTH // self.cols
-        self.square_height = HEIGHT // self.rows
+        self.square_width = self.width // self.cols
+        self.square_height = self.height // self.rows
         
     def squares(self):
         """
@@ -26,13 +28,13 @@ class Board:
         """
         
         # Building lists of columns and rows depending on the screen and square width and height.
-        col_starts = range(0, WIDTH, self.square_width)
-        row_starts = range(0, HEIGHT, self.square_height)
+        col_start_points = range(0, self.width, self.square_width)
+        row_start_points = range(0, self.height, self.square_height)
         
         # Returns a list of lists representing the board.
         return [
-            [(col, row) for col in col_starts]
-            for row in row_starts]
+            [(col, row) for col in col_start_points]
+            for row in row_start_points]
 
     
     def place_piece(self, piece):
@@ -113,12 +115,13 @@ class Board:
         
     def reset_board(self, piece, new_position, original_position, old_piece=[]):
         """
-        Places the piece at it's new square and clears the old square.
+        Places the piece at its original position, resets the new position square.
 
         Args:
             piece (object): Piece being moved.
-            new_position (tuple): The new position of the piece
-            original_position (_type_): The original position of the piece.
+            new_position (tuple): New position of piece: (col, row)
+            original_position (tuple): Original position of piece: (col, row)
+            old_piece (object, optional): Piece being captured or empty list if no piece. Defaults to [].
         """
         
         # Unpacking the location tuples.

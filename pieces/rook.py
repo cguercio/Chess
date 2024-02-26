@@ -8,6 +8,7 @@ class Rook(Piece):
         self.col = col
         self.row = row
         self.color = color
+        self.has_moved = False
 
         if self.color == BLACK:
             self.img = os.path.join(os.path.dirname(__file__),'..','graphics',
@@ -40,3 +41,13 @@ class Rook(Piece):
             return False
 
         return True
+    
+    def move(self, location):
+        """
+        Sets piece col and row to location passed in.
+
+        Args:
+            location (tuple): Location to move to: (col, row)
+        """
+        self.col, self.row = location
+        self.has_moved = True

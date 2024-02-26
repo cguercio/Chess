@@ -49,12 +49,12 @@ class Game:
         
         return list(zip(x_points, y_points))
     
-    def piece_in_path(self, chessboard, new_position, original_position):
+    def piece_in_path(self, board, new_position, original_position):
         
         piece_path = self.find_path_points(new_position, original_position)
         
         for point in piece_path:
-            if chessboard.board[point[0]][point[1]] != []:
+            if board.board[point[0]][point[1]] != []:
                 return True
             
         return False
@@ -155,7 +155,7 @@ class Game:
 
         return white_king_object, black_king_object
 
-    def castling(self, screen, piece, chessboard, new_position, original_position):
+    def can_castle(self, screen, piece, chessboard, new_position, original_position):
 
         # Unpacking the move positions.
         num_cols = len(chessboard.board[0]) # Gets the number of cols by getting the length of the first list
@@ -172,7 +172,7 @@ class Game:
         if piece.in_check == True:
             piece.in_check = False
             piece.castling = False
-            return False, chessboard
+            return False 
         
         # Column direction factor determines the direction of the move.
         # This is used for the range start and step of the iteration.
@@ -204,7 +204,7 @@ class Game:
             # Checks if the king is in check.
             if piece.in_check == True:
                 chessboard.reset_castling(piece, new_position, original_position, i)
-                return False, chessboard
+                return False 
         
         # If the king castles in negative x an extra square is reset.
         if left_castle == -1:
@@ -213,6 +213,11 @@ class Game:
         # Finds the appropriate rook object depending on which direction the user castled.
         rook_col = 0 if col_diff < 0 else num_cols - 1
         rook = chessboard.board[rook_col][old_row]
+        
+        # Checks for a previous rook move.
+        if rook.has_moved == True:
+            chessboard.reset_castling(piece, new_position, original_position, i)
+            return False
         
         # Update the board with rook move if castling is allowed.
         new_rook_col = new_col + col_dir_factor * -1
@@ -225,9 +230,9 @@ class Game:
 
         # Draw the rook move on the screen. 
         screen.update_move(chessboard, rook, [], (new_rook_col, new_row), (rook_col, old_row))
-        piece.has_moved = True
+        piece.castling = False
 
-        return True, chessboard
+        return True 
 
     def find_kings(self, chessboard):
         """
