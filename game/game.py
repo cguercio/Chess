@@ -407,20 +407,3 @@ class Game:
             return True
         
         return False
-    
-    def select_promotion(self, pos, chessboard, piece, player):
-        if piece.color == WHITE:
-            step = [0, 1, 2, 3]
-        else:
-            step = [0, -1, -2, -3]
-
-        for num in step:
-            if player.click_square(pos, chessboard, (piece.col, piece.row + num)):
-                if num == 0:
-                    return Queen(piece.col, piece.row, piece.color)
-                elif num in [-1, 1]:
-                    return Rook(piece.col, piece.row, piece.color)
-                elif num in [-2, 2]:
-                    return Bishop(piece.col, piece.row, piece.color)
-                elif num in [-3, 3]:
-                    return Knight(piece.col, piece.row, piece.color)

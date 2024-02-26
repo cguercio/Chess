@@ -15,24 +15,6 @@ def mouse_click():
                 if event.button == 3:
                     return False
             
-def mouse_pos_to_board_pos(pos, chessboard):
-    """
-    Converts the mouse position to the board position.
-
-    Args:
-        pos (tuple): Mouse position.
-        board (list): Chessboard as a 2D list.
-
-    Returns:
-        tuple: Returns the new board position.
-    """
-    
-    num_cols = len(chessboard.board[0]) # Gets the number of cols by getting the length of the first list
-    num_rows = len(chessboard.board) # Gets the number of rows by getting the number of lists
-    square_width = WIDTH // num_cols
-    square_height = HEIGHT // num_rows
-
-    return (int(math.floor(pos[0] // square_width)), int(math.floor(pos[1] // square_height)))
 
 def valid_move(piece, chessboard, new_position, original_position, game, screen):
     """

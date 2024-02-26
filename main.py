@@ -117,10 +117,13 @@ def main():
                 index = 0
             
                 mouse_pos = pygame.mouse.get_pos()
-                state, piece, original_position = player.move(mouse_pos, chessboard)
+                board_position = chessboard.get_board_position(mouse_pos)
+                piece = chessboard.get_square_contents(board_position)
                 
-                if (state == True and piece.color == WHITE and game.move_counter % 2 == 0
-                    or state == True and piece.color == BLACK and game.move_counter % 2 != 0):
+                piece_selected = True if piece != [] else False
+                
+                if (piece_selected == True and piece.color == WHITE and game.move_counter % 2 == 0
+                    or piece_selected == True and piece.color == BLACK and game.move_counter % 2 != 0):
                     mouse_down = True
                     
                 while mouse_down:
@@ -165,11 +168,13 @@ def main():
                 
             # Checks if the user tried to move a piece.
             if move == True:
-                new_position = mouse_pos_to_board_pos(mouse_pos2, chessboard)
-                print(new_position)
+                original_position = (piece.col, piece.row)
+                new_position = chessboard.get_board_position(mouse_pos2)
                 old_piece = chessboard.board[new_position[0]][new_position[1]]
+                
                 if old_piece != [] and old_piece.color == piece.color:
                     old_piece = []
+                    
                 temp_board = copy.copy(chessboard)
                 result, next_board = valid_move(piece, temp_board, new_position, original_position, game, screen)
                 
@@ -179,6 +184,7 @@ def main():
                     # Updates the move list with the pawn move.
                     
                     screen.display_promotion(piece, chessboard)
+                    
                     if not mouse_click():
                         result == False
                         move = False
@@ -190,9 +196,9 @@ def main():
                         
                     else:
                         game.move_list.append((game.move_counter, piece, new_position, original_position, old_piece))
-                        mouse_pos = pygame.mouse.get_pos()
-                        promoted_pawn = game.select_promotion(mouse_pos, chessboard, piece, player)
-
+                        clicked_position = chessboard.get_board_position(pygame.mouse.get_pos())
+                        promoted_pawn = piece.select_promotion(clicked_position)
+                        
                         # Updates the move list with the queen move. This way the move list has all information.
                         game.move_list.append((game.move_counter, promoted_pawn, new_position, original_position, old_piece))
                         

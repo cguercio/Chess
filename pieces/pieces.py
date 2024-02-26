@@ -28,7 +28,7 @@ class Piece:
 
         # Defining black pieces to display promotion images.
         if piece.color == BLACK:
-            promotion_pieces = [Piece.Queen(None, None, piece.color),
+            promotion_pieces = [Queen(None, None, piece.color),
                                 Rook(None, None, piece.color),
                                 Bishop(None, None, piece.color),
                                 Knight(None, None, piece.color)
@@ -52,3 +52,37 @@ class Piece:
             location (tuple): Location to be moved: (col, row)
         """
         self.col, self.row = location
+        
+    def select_promotion(self, board_position):
+        """
+        Selects the promotion piece based on location the user clicked.
+
+        Args:
+            board_position (tuple): Board position where the user clicked: (col, row).
+
+        Returns:
+            object: Promoted piece.
+        """
+        
+        # Importing piece classes.
+        from .rook import Rook
+        from .knight import Knight
+        from .bishop import Bishop
+        from .queen import Queen
+        
+        col, row = board_position
+        
+        # Defining helper variables.
+        clicked_on_queen = row == self.row
+        clicked_on_rook = row - self.row in [-1, 1]
+        clicked_on_bishop = row - self.row in [-2, 2]
+        clicked_on_knight = row - self.row in [-3, 3]
+
+        if clicked_on_queen:
+            return Queen(self.col, self.row, self.color)
+        elif clicked_on_rook:
+            return Rook(self.col, self.row, self.color)
+        elif clicked_on_bishop:
+            return Bishop(self.col, self.row, self.color)
+        elif clicked_on_knight:
+            return Knight(self.col, self.row, self.color)

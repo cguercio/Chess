@@ -1,15 +1,18 @@
 from constants import *
 from utils import *
 from pieces import *
+import math
 
 class Board:
     board_list = []
 
-    def __init__(self, x_squares, y_squares):
-        self.x_squares = x_squares
-        self.y_squares = y_squares
-        self.board = [[[] for _ in range(x_squares)] for _ in range(y_squares)]
-
+    def __init__(self, cols, rows):
+        self.cols = cols
+        self.rows = rows
+        self.board = [[[] for _ in range(cols)] for _ in range(rows)]
+        self.square_width = WIDTH // self.cols
+        self.square_height = HEIGHT // self.rows
+        
     def squares(self):
         """
         Returns a list of lists representing the coordinates of each square on the chessboard.
@@ -21,14 +24,15 @@ class Board:
             A list of lists, where each inner list contains the (x, y) coordinates of a square.
 
         """
-        # Calculating square height and width.
-        square_width = WIDTH // self.x_squares
-        square_height = HEIGHT // self.y_squares
-
+        
+        # Building lists of columns and rows depending on the screen and square width and height.
+        col_starts = range(0, WIDTH, self.square_width)
+        row_starts = range(0, HEIGHT, self.square_height)
+        
         # Returns a list of lists representing the board.
         return [
-            [(x, y) for x in range(0, WIDTH, square_width)]
-            for y in range(0, HEIGHT, square_height)]
+            [(col, row) for col in col_starts]
+            for row in row_starts]
 
     
     def place_piece(self, piece):
@@ -48,6 +52,41 @@ class Board:
         # Set the pieces at their locations on the board.
         if col is not None and row is not None:
             self.board[col][row] = piece
+            
+    def get_board_position(self, mouse_position):
+        """
+        Converts the mouse position to the board position.
+
+        Args:
+            pos (tuple): Mouse position.
+            board (list): Chessboard as a 2D list.
+
+        Returns:
+            tuple: Returns the new board position.
+        """
+        
+        board_col = int(math.floor(mouse_position[0] // self.square_width))
+        board_row = int(math.floor(mouse_position[1] // self.square_height))
+
+        return board_col, board_row
+    
+    def get_square_contents(self, board_position):
+        """
+        Checks if the player clicked on a piece.
+
+        Args:
+            board_position (tuple): Position on the board where the player clicked: (col, row)
+
+        Returns:
+            bool, object, tuple: True if player clicked on piece, False if not. Piece clicked on and piece position.
+        """
+
+        # Unpacking location tuples.
+        col, row = board_position
+
+        contents = self.board[col][row]
+
+        return contents
         
     def update_board(self, piece, new_position, original_position):
         """
