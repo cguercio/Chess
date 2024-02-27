@@ -240,6 +240,7 @@ def main():
                         pygame.display.flip()
                         
                         move = False
+                        valid_move == False
                         game.move_counter += 1
                         
                 
@@ -252,10 +253,12 @@ def main():
                     game.move_list.append((game.move_counter, piece, (piece.col, piece.row), original_position, old_piece))
                     
                     move = False
+                    valid_move == False
                     game.move_counter += 1
                 
                 elif valid_move == False:
                     move = False
+                    valid_move == False
                     screen.draw_squares(square_list, WHITE, GREEN)
                     screen.draw_pieces(chessboard)
                     pygame.display.flip()

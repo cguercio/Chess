@@ -453,8 +453,8 @@ class Game:
         for position in king_move_list:
             
             # True if king can move and king can capture.
-            move_is_valid = (king.is_valid_move(position, king_position)
-                        and self.can_capture(chessboard.board, position, king_position))
+            move_is_valid = (king.is_valid_move(position, king_position) == True
+                        and self.can_capture(chessboard.board, position, king_position)) == True
             
             # Checks if the king move is valid.
             if move_is_valid:
@@ -524,6 +524,7 @@ class Game:
             for piece in rank:
                 if (piece != [] and not isinstance(piece, King) and piece.color == king.color
                 and piece.is_valid_move((check_piece.col, check_piece.row), (piece.col, piece.row))
+                and self.piece_in_path(chessboard.board, (check_piece.col, check_piece.row), (piece.col, piece.row)) == False
                 and self.can_capture(chessboard.board, (check_piece.col, check_piece.row), (piece.col, piece.row))):
                     return True
 
