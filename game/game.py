@@ -18,142 +18,270 @@ class Game:
         Builds a list of points in between two locations on the board.
 
         Args:
-            position1 (tuple): (x, y).
-            position2 (tuple): (x, y).
+            position1 (tuple): Board position: (col, row).
+            position2 (tuple): Board position: (col, row).
 
         Returns:
-            list: List of tuples containing x and y values.
+            list: List of tuples containing board positions in between the pieces.
         """
-        new_col, new_row = position1
-        old_col, old_row = position2
-        num_points = max(abs(new_col - old_col), abs(new_row - old_row))
-
-        # Builds a list of x points in between the original piece position
-        # and the new piece position.
-        if new_col - old_col == 0:
-            x_points = [new_col for _ in range(1, num_points)]
-        elif new_col - old_col > 0:
-            x_points = [x for x in range(old_col + 1, new_col)]
+        
+        # Unpacking position tuples.
+        col1, row1 = position1
+        col2, row2 = position2
+        
+        # Defining helper variables.
+        num_points = max(abs(col1 - col2), abs(row1 - row2))
+        num_points_list = range(1, num_points)
+        
+        # Checks if col position stays the same.
+        if col1 == col2:
+            # Since col did not change, populate the list with the original column
+            # for the number of points needed.
+            col_points = [col1 for _ in num_points_list]
+        elif col1 > col2:
+            # Since col2 is less than col1, iterate forward from col2 to col1.
+            # This populates the list in ascending order.
+            col_points = [col for col in range(col2 + 1, col1)]
         else:
-            x_points = [x for x in range(old_col - 1, new_col, -1)]
+            # Since col1 is less than col2, iterate backward from col1 to col2.
+            # This populates the list in ascending order.
+            col_points = [col for col in range(col2 - 1, col1, -1)]
 
         # Builds a list of y points in between the original piece position
         # and the new piece position.
-        if new_row - old_row == 0:
-            y_points = [new_row for _ in range(1, num_points)]
-        elif new_row - old_row > 0:
-            y_points = [y for y in range(old_row + 1, new_row)]
+        if row1 == row2:
+            # Since row did not change, populate the list with the original row
+            # for the number of points needed.
+            row_points = [row1 for _ in num_points_list]
+        elif row1 > row2:
+            # Since row2 is less than row1, iterate forward from row2 to row1.
+            # This populates the list in ascending order.
+            row_points = [row for row in range(row2 + 1, row1)]
         else:
-            y_points = [y for y in range(old_row - 1, new_row, -1)]
+            # Since row1 is less than row2, iterate backward from row1 to row2.
+            # This populates the list in ascending order.
+            row_points = [row for row in range(row2 - 1, row1, -1)]
 
+        # Zips the lists together to create a list of tuples representing
+        # the path between two points.
+        points_in_path = list(zip(col_points, row_points))
         
-        return list(zip(x_points, y_points))
+        return points_in_path
     
-    def piece_in_path(self, board, new_position, original_position):
+    
+    def piece_in_path(self, board, position1, position2):
+        """
+        Checks if a piece is in the path of two points.
+
+        Args:
+            board (list): 2D list representing the board.
+            position1 (tuple): Position 1 on the board: (col, row)
+            position2 (tuple): Position 2 on the board: (col, row)
+
+        Returns:
+            bool: True if there is a piece in the path, False otherwise.
+        """
+
+        # Getting the path between the two positions.
+        piece_path = self.find_path_points(position1, position2)
         
-        piece_path = self.find_path_points(new_position, original_position)
-        
+        # Loops over the positions in the path.
         for point in piece_path:
-            if board.board[point[0]][point[1]] != []:
+            
+            # Checks for a piece in the position.
+            piece_in_position = board[point[0]][point[1]] != []
+            
+            if piece_in_position:
                 return True
             
         return False
     
-    def can_capture(self, chessboard, new_position, original_position):
+    def can_capture(self, board, new_position, original_position):
         """
-        Checks that the pieces only capture pieces of opposite color.
+        Check for a valid capture.
 
         Args:
-            board (list): The chessboard as a 2D list
-            piece (object): The chess piece to be moved.
-            original_position (tuple): The original position of the piece.
+            board (list): 2D list representing the board.
+            new_position (tuple): Position to which the piece is being moved.
+            original_position (tuple): Original position of the piece.
 
         Returns:
-            Boolean: True if capture is valid, False otherwise.
+            bool: False if the capture is not valid, True otherwise.
         """
+        # Unpacking position tuples.
         old_col, old_row = original_position
         new_col, new_row = new_position
         
-        # Checks if a piece is trying to capture and if it is a valid capture.
-        if (chessboard.board[new_col][new_row] != []
-            and chessboard.board[new_col][new_row].color == chessboard.board[old_col][old_row].color):
-            return False
+        # Defining helper variables.
+        piece = board[old_col][old_row]
+        piece_at_new_position = board[new_col][new_row] != []
+        
+        # Checks if a piece is trying to capture 
+        # and the piece being captures is not the same color.
+        if piece_at_new_position:
+            
+            are_same_color = board[new_col][new_row].color == piece.color
+            
+            if are_same_color:
+                return False
         
         # Calls pawn capture logic if piece is a pawn.
-        if isinstance(chessboard.board[old_col][old_row], Pawn):
-            return self.pawn_can_capture(chessboard, new_position, original_position)
+        if isinstance(piece, Pawn):
+            return self.pawn_can_capture(board, new_position, original_position)
         
         
         return True
         
-    def pawn_can_capture(self, chessboard, new_position, original_position):
+    def pawn_can_capture(self, board, new_position, original_position):
         """
-        Checks for pieces in front of moving pawns and checks for piece when pawn
-        tries to capture.
+        Checks for valid pawn capture.
 
         Args:
-            board (list): The chessboard in a 2D list.
-            piece (object): The chess piece to be moved.
-            new_row (int): Board row to move piece to.
-            new_col (int): Board column to move piece to,
-            old_row (int): Board row where piece was.
-            old_col (int): Board column where piece was.
+            board (list): 2D list representing the board.
+            new_position (tuple): Position to which the piece is being moved.
+            original_position (tuple): Original position of the piece.
 
         Returns:
-            boolean: True if capture is valid, False otherwise.
+            bool: False if the capture is not valid, True otherwise.
         """
+
+        # Unpacking position tuples.
         old_col, old_row = original_position
         new_col, new_row = new_position
         
+        # Defining helper variables.
+        piece_in_front_of_pawn = board[new_col][new_row] != []
+        pawn_moving_forward = new_col == old_col
+        square_is_empty = board[new_col][new_row] == []
+        pawn_is_capturing = new_col != old_col
+        
         # Check if piece is in front of moving pawn, disallowing movement or capture.
-        if (chessboard.board[new_col][new_row] and new_col == old_col):
+        if piece_in_front_of_pawn and pawn_moving_forward:
             return False
         
         # Checks if pawn tries move to capture square but there is
         # no piece to capture, disallow capture or movement.
-        elif not chessboard.board[new_col][new_row] and new_col != old_col:
+        elif square_is_empty and pawn_is_capturing:
             return False
         
         return True
-    
-    def in_check(self, chessboard):
+
+    def find_kings(self, board):
         """
-        Checks both kings for check and sets check
-        attribute to True if necessary.
+        Find the location of the kings on any given board.
 
         Args:
-            board (list): Chess board as a 2D list.
-            w_king (object): White king.
-            b_king (object): Black king.
+            board (list): Chessboard as a 2D list.
+
+        Returns:
+            tuple, object: Returns king locations and objects:
+            white_king_pos, white_king_object, black_king_pos, black_king_object
+        """
+        # Iterates over the board to find the black and white kings.
+        for col, rank in enumerate(board):
+            for row, item in enumerate(rank):
+                if isinstance(item, King) and item.color == WHITE:
+                    white_king_pos = (col, row)
+                    white_king_object = item
+                elif isinstance(item, King) and item.color == BLACK:
+                    black_king_pos = (col, row)
+                    black_king_object = item
+                    
+        return white_king_pos, white_king_object, black_king_pos, black_king_object
+    
+    def find_all_pieces(self, board):
+        """
+        Iterates over a given board and builds lists of pieces.
+
+        Args:
+            board (list): 2D list representing the board.
+
+        Returns:
+            list: Lists of black and white pieces: white_pieces, black_pieces
+        """
+        
+        # Initiating the lists.
+        black_pieces = []
+        white_pieces =[]
+        
+        # Iterates over the board and builds piece lists.
+        for rank in board:
+            for piece in rank:
+                if piece != []:
+                    if piece.color == BLACK:
+                        black_pieces.append(piece)
+                    elif piece.color == WHITE:
+                        white_pieces.append(piece)
+                        
+        return white_pieces, black_pieces
+    
+    def in_check(self, board):
+        """
+        Checks if the kings are in check and updates the in_check attribute.
+
+        Args:
+            board (list): 2D list representing the board.
+
+        Returns:
+            object: King objects: white_king,
         """
 
-        # Finds the location of the kings on the temp board.
-        white_king_pos, white_king_object, black_king_pos, black_king_object = self.find_kings(chessboard) 
+        # Getting king objects and locations
+        white_king_pos, white_king_object, black_king_pos, black_king_object = self.find_kings(board) 
+        
+        # Getting white and black piece lists.
+        white_pieces, black_pieces = self.find_all_pieces(board)
+        
+        # Resetting in_check attribute before looking for checks.
         white_king_object.in_check = False
         black_king_object.in_check = False
         
-        # Looping thought piece objects.
-        for col, rank in enumerate(chessboard.board):
-            for row, piece in enumerate(rank):
-                if piece != []:
-                    original_position = (col, row)
-                    # Trying to move all black pieces to the white king.
-                    if (piece.color == BLACK and piece.is_valid_move(white_king_pos, original_position) == True
-                        and self.piece_in_path(chessboard, white_king_pos, original_position) == False
-                        and self.can_capture(chessboard, white_king_pos, original_position) == True):
-                        print("white in check")
-                        self.check_list.append(piece)
-                        white_king_object.in_check = True
-
-                    # Trying to move all white pieces to the black king.
-                    elif (piece.color == WHITE and piece.is_valid_move(black_king_pos, original_position) == True
-                        and self.piece_in_path(chessboard, black_king_pos, original_position) == False
-                        and self.can_capture(chessboard, black_king_pos, original_position) == True):
-                        black_king_object.in_check = True
-                        self.check_list.append(piece)
-                        print("black in check")
+        # Loop through the black piece list.
+        for piece in black_pieces:
+            
+            # Setting the position of the piece.
+            original_position = (piece.col, piece.row)
+            
+            # Check if a piece can capture the king.
+            if self.piece_can_capture_king(piece, board, white_king_pos, original_position):
+                self.check_list.append(piece)
+                white_king_object.in_check = True 
+        
+        # Loop through the black piece list.        
+        for piece in white_pieces:
+            
+            # Setting the position of the piece.
+            original_position = (piece.col, piece.row)
+            
+            # Check if a piece can capture the king.
+            if self.piece_can_capture_king(piece, board, black_king_pos, original_position):
+                self.check_list.append(piece)
+                black_king_object.in_check = True 
 
         return white_king_object, black_king_object
+    
+    def piece_can_capture_king(self, piece, board, king_position, original_position):
+        """
+        Checks if a piece move to and capture the king.
+
+        Args:
+            piece (object): Piece moving to king.
+            board (list): 2D list representing the board.
+            king_position (tuple): Position of king: (col, row)
+            original_position (tuple): Original position of piece: (col, row)
+
+        Returns:
+            bool: True if king can be captured, false otherwise.
+        """
+        
+        # Check is piece can move to and capture the king.
+        if (piece.is_valid_move(king_position, original_position) == True
+            and self.piece_in_path(board, king_position, original_position) == False
+            and self.can_capture(board, king_position, original_position) == True):
+            return True
+        
+        return False
+    
 
     def can_castle(self, screen, piece, chessboard, new_position, original_position):
 
@@ -166,7 +294,7 @@ class Game:
         col_diff = new_col - old_col
         
         # Check if the king is currently in check.
-        self.in_check(chessboard)
+        self.in_check(chessboard.board)
 
         # If king is in check when castling, disallow castling and reset attributes
         if piece.in_check == True:
@@ -199,7 +327,7 @@ class Game:
             chessboard.update_board(piece, (next_col, old_row), (previous_col, old_row))
             
             # Checking to see if the new square is in check.
-            self.in_check(chessboard)
+            self.in_check(chessboard.board)
                 
             # Checks if the king is in check.
             if piece.in_check == True:
@@ -233,27 +361,6 @@ class Game:
         piece.castling = False
 
         return True 
-
-    def find_kings(self, chessboard):
-        """
-        Find the location of the kings on any given board.
-
-        Args:
-            board (list): Chessboard as a 2D list.
-
-        Returns:
-            tuple, object: Returns king locations and objects.
-        """
-        for col, rank in enumerate(chessboard.board):
-            for row, item in enumerate(rank):
-                if isinstance(item, King) and item.color == WHITE:
-                    white_king_pos = (col, row)
-                    white_king_object = item
-                elif isinstance(item, King) and item.color == BLACK:
-                    black_king_pos = (col, row)
-                    black_king_object = item
-                    
-        return white_king_pos, white_king_object, black_king_pos, black_king_object
     
     def results_in_check(self, piece, chessboard):
         """
@@ -268,7 +375,7 @@ class Game:
         """
 
         # Checking if the kings are in check and updating their attribute.
-        white_king, black_king = self.in_check(chessboard)
+        white_king, black_king = self.in_check(chessboard.board)
 
         if white_king.in_check == True and piece.color == WHITE:
             black_king.in_check = False
@@ -319,7 +426,7 @@ class Game:
             
             # Checks if the king move is valid.
             if (king.is_valid_move(point, (king.col, king.row))
-                and self.can_capture(chessboard, point, (king.col, king.row))):
+                and self.can_capture(chessboard.board, point, (king.col, king.row))):
                 
                 # Updates the board with the new king move.
                 captured_piece = chessboard.update_board(king, point, (king.col, king.row))
@@ -358,8 +465,8 @@ class Game:
                 if piece != [] and not isinstance(piece, King) and piece.color == king.color:
                     for point in check_path:
                         if (piece.is_valid_move(point, (piece.col, piece.row))
-                        and not self.piece_in_path(chessboard, point, (piece.col, piece.row))
-                        and self.can_capture(chessboard, point,(piece.col, piece.row))):
+                        and not self.piece_in_path(chessboard.board, point, (piece.col, piece.row))
+                        and self.can_capture(chessboard.board, point,(piece.col, piece.row))):
                             print("not mate")
                             return True
                         
@@ -384,7 +491,7 @@ class Game:
             for piece in rank:
                 if (piece != [] and not isinstance(piece, King) and piece.color == king.color
                 and piece.is_valid_move((check_piece.col, check_piece.row), (piece.col, piece.row))
-                and self.can_capture(chessboard, (check_piece.col, check_piece.row), (piece.col, piece.row))):
+                and self.can_capture(chessboard.board, (check_piece.col, check_piece.row), (piece.col, piece.row))):
                     return True
 
         return False
