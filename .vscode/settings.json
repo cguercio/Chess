@@ -5,6 +5,7 @@
         "MOUSEBUTTONDOWN",
         "MOUSEBUTTONUP",
         "pygame",
+        "queenside",
         "sourcery"
     ]
 }

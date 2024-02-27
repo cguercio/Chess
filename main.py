@@ -203,7 +203,7 @@ def main():
                     captured_piece = chessboard.update_board(piece, new_position, original_position)
 
                     # Check if the piece's king is in check, disallowing movement and resetting the board.
-                    if game.results_in_check(piece, chessboard) == True:
+                    if game.results_in_check(piece, chessboard.board) == True:
                         chessboard.reset_board(piece, new_position, original_position, captured_piece)
                         valid_move = False
                     else:
