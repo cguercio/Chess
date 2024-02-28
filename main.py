@@ -195,7 +195,7 @@ def main():
                     else:
                         valid_move = True
                         
-                elif game.can_capture(chessboard.board, new_position, original_position) == False:
+                elif game.can_capture(piece, chessboard.board, new_position, original_position) == False:
                     valid_move = False
                     
                 else:
@@ -204,6 +204,7 @@ def main():
 
                     # Check if the piece's king is in check, disallowing movement and resetting the board.
                     if game.results_in_check(piece, chessboard.board) == True:
+                        print("false")
                         chessboard.reset_board(piece, new_position, original_position, captured_piece)
                         valid_move = False
                     else:

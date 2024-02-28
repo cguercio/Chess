@@ -96,7 +96,7 @@ class Game:
             
         return False
     
-    def can_capture(self, board, new_position, original_position):
+    def can_capture(self,piece, board, new_position, original_position):
         """
         Check for a valid capture.
 
@@ -113,15 +113,13 @@ class Game:
         new_col, new_row = new_position
         
         # Defining helper variables.
-        piece = board[old_col][old_row]
-        piece_at_new_position = board[new_col][new_row] != []
+        piece_at_new_position = isinstance(board[new_col][new_row], Piece)
         
         # Checks if a piece is trying to capture 
         # and the piece being captures is not the same color.
         if piece_at_new_position:
-            
             are_same_color = board[new_col][new_row].color == piece.color
-            
+
             if are_same_color:
                 return False
         
@@ -165,6 +163,32 @@ class Game:
             return False
         
         return True
+    
+    def is_valid_move(self, piece, board, from_square, to_square):
+        """
+        Checks if the move is valid.
+
+        Args:
+            piece (object): Piece being moved.
+            board (list): 2D list representing the board.
+            from_square (tuple): Starting square of the piece.
+            to_square (tuple): Square to which the piece is being moved.
+
+        Returns:
+            bool: True if move is valid, False otherwise.
+        """
+        
+        # Defining helper variables.
+        piece_move_is_valid = piece.is_valid_move(to_square, from_square) == True
+        path_not_blocked = self.piece_in_path(board, to_square, from_square) == False
+        capture_is_valid = self.can_capture(piece, board, to_square, from_square) == True
+        
+        if (piece_move_is_valid 
+            and path_not_blocked
+            and capture_is_valid):
+            return True
+        
+        return False
 
     def find_kings(self, board):
         """
@@ -189,31 +213,31 @@ class Game:
                     
         return white_king_pos, white_king_object, black_king_pos, black_king_object
     
-    def find_all_pieces(self, board):
+    def get_piece_by_color(self, board, color):
         """
-        Iterates over a given board and builds lists of pieces.
+        Gets a list of the pieces on the board given a color.
 
         Args:
             board (list): 2D list representing the board.
+            color (rgb): WHITE or BLACK.
 
         Returns:
-            list: Lists of black and white pieces: white_pieces, black_pieces
+            list: List of pieces on the board of specified color.
         """
+        # Forcing the color to be either white or black.
+        assert color in [WHITE, BLACK]
         
         # Initiating the lists.
-        black_pieces = []
-        white_pieces =[]
+        pieces = []
         
         # Iterates over the board and builds piece lists.
         for rank in board:
             for piece in rank:
-                if piece != []:
-                    if piece.color == BLACK:
-                        black_pieces.append(piece)
-                    elif piece.color == WHITE:
-                        white_pieces.append(piece)
+                if piece != [] and piece.color == color:
+                    pieces.append(piece)
+                    
                         
-        return white_pieces, black_pieces
+        return pieces
     
     def in_check(self, board):
         """
@@ -230,7 +254,8 @@ class Game:
         white_king_pos, white_king_object, black_king_pos, black_king_object = self.find_kings(board) 
         
         # Getting white and black piece lists.
-        white_pieces, black_pieces = self.find_all_pieces(board)
+        white_pieces = self.get_piece_by_color(board, WHITE)
+        black_pieces = self.get_piece_by_color(board, BLACK)
         
         # Resetting in_check attribute before looking for checks.
         white_king_object.in_check = False
@@ -240,10 +265,10 @@ class Game:
         for piece in black_pieces:
             
             # Setting the position of the piece.
-            original_position = (piece.col, piece.row)
+            piece_position = (piece.col, piece.row)
             
             # Check if a piece can capture the king.
-            if self.piece_can_capture_king(piece, board, white_king_pos, original_position):
+            if self.is_valid_move(piece, board, piece_position, white_king_pos):
                 self.check_list.append(piece)
                 white_king_object.in_check = True 
         
@@ -251,37 +276,14 @@ class Game:
         for piece in white_pieces:
             
             # Setting the position of the piece.
-            original_position = (piece.col, piece.row)
+            piece_position = (piece.col, piece.row)
             
             # Check if a piece can capture the king.
-            if self.piece_can_capture_king(piece, board, black_king_pos, original_position):
+            if self.is_valid_move(piece, board, piece_position, black_king_pos):
                 self.check_list.append(piece)
                 black_king_object.in_check = True 
 
         return white_king_object, black_king_object
-    
-    def piece_can_capture_king(self, piece, board, king_position, original_position):
-        """
-        Checks if a piece move to and capture the king.
-
-        Args:
-            piece (object): Piece moving to king.
-            board (list): 2D list representing the board.
-            king_position (tuple): Position of king: (col, row)
-            original_position (tuple): Original position of piece: (col, row)
-
-        Returns:
-            bool: True if king can be captured, false otherwise.
-        """
-        
-        # Check is piece can move to and capture the king.
-        if (piece.is_valid_move(king_position, original_position) == True
-            and self.piece_in_path(board, king_position, original_position) == False
-            and self.can_capture(board, king_position, original_position) == True):
-            return True
-        
-        return False
-    
 
     def can_castle(self, screen, king, chessboard, new_position, original_position):
         """
@@ -454,7 +456,7 @@ class Game:
             
             # True if king can move and king can capture.
             move_is_valid = (king.is_valid_move(position, king_position) == True
-                        and self.can_capture(chessboard.board, position, king_position)) == True
+                        and self.can_capture(king, chessboard.board, position, king_position)) == True
             
             # Checks if the king move is valid.
             if move_is_valid:
@@ -474,7 +476,7 @@ class Game:
             
         return False
             
-    def piece_can_block(self, chessboard, king): ######## Start here
+    def piece_can_block(self, board, king):
         """
         Checks if a piece can block check.
 
@@ -491,17 +493,18 @@ class Game:
         
         # Getting the path in between the piece giving check and the king.
         check_path = self.find_path_points((check_piece.col, check_piece.row), (king.col, king.row))
+        piece_color = king.color
         
-        # Iterates over the board to check if any pieces can block the check.
-        for rank in chessboard.board:
-            for piece in rank:
-                if piece != [] and not isinstance(piece, King) and piece.color == king.color:
-                    for point in check_path:
-                        if (piece.is_valid_move(point, (piece.col, piece.row))
-                        and not self.piece_in_path(chessboard.board, point, (piece.col, piece.row))
-                        and self.can_capture(chessboard.board, point,(piece.col, piece.row))):
-                            print("not mate")
-                            return True
+        pieces = self.get_piece_by_color(board, piece_color)
+        
+        for piece in pieces:
+            if not isinstance(piece, King):
+                for square in check_path:
+                    
+                    piece_position = (piece.col, piece.row)
+                    
+                    if self.is_valid_move(piece, board, piece_position, square) == True:
+                        return True
                         
         return False
     
@@ -525,7 +528,7 @@ class Game:
                 if (piece != [] and not isinstance(piece, King) and piece.color == king.color
                 and piece.is_valid_move((check_piece.col, check_piece.row), (piece.col, piece.row))
                 and self.piece_in_path(chessboard.board, (check_piece.col, check_piece.row), (piece.col, piece.row)) == False
-                and self.can_capture(chessboard.board, (check_piece.col, check_piece.row), (piece.col, piece.row))):
+                and self.can_capture(king, chessboard.board, (check_piece.col, check_piece.row), (piece.col, piece.row))):
                     return True
 
         return False
@@ -548,7 +551,7 @@ class Game:
         and not self.king_can_move(chessboard, king)):
             return True
         elif (not self.king_can_move(chessboard, king)
-        and not self.piece_can_block(chessboard, king)
+        and not self.piece_can_block(chessboard.board, king)
         and not self.can_capture_check_piece(chessboard, king)):
             return True
         
