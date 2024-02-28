@@ -261,6 +261,8 @@ class Game:
         white_king_object.in_check = False
         black_king_object.in_check = False
         
+        self.check_list = []
+        
         # Loop through the black piece list.
         for piece in black_pieces:
             
@@ -493,22 +495,26 @@ class Game:
         
         # Getting the path in between the piece giving check and the king.
         check_path = self.find_path_points((check_piece.col, check_piece.row), (king.col, king.row))
-        piece_color = king.color
         
-        pieces = self.get_piece_by_color(board, piece_color)
+        # Getting the pieces that have the same color as the king.
+        pieces = self.get_piece_by_color(board, king.color)
         
+        # Iterates through the list of pieces.
         for piece in pieces:
+            # Check that the piece is not a king.
             if not isinstance(piece, King):
+                
+                # Iterates over every square in the path of check.
                 for square in check_path:
-                    
                     piece_position = (piece.col, piece.row)
                     
+                    # Checks if a piece moving in the path of the check is valid.
                     if self.is_valid_move(piece, board, piece_position, square) == True:
                         return True
                         
         return False
     
-    def can_capture_check_piece(self, chessboard, king):
+    def can_capture_check_piece(self, board, king): ###### not detecting checkmate after change here
         """
         Checks if a piece can capture the piece giving check.
 
@@ -521,14 +527,15 @@ class Game:
         """
         # Getting the piece giving check.
         check_piece = self.check_list[0]
+        check_piece_position = (check_piece.col, check_piece.row)
         
-        # Iterates over the board to check if any pieces can capture the piece giving check.
-        for rank in chessboard.board:
-            for piece in rank:
-                if (piece != [] and not isinstance(piece, King) and piece.color == king.color
-                and piece.is_valid_move((check_piece.col, check_piece.row), (piece.col, piece.row))
-                and self.piece_in_path(chessboard.board, (check_piece.col, check_piece.row), (piece.col, piece.row)) == False
-                and self.can_capture(king, chessboard.board, (check_piece.col, check_piece.row), (piece.col, piece.row))):
+        # Getting the pieces that have the same color as the king in check.
+        pieces = self.get_piece_by_color(board, king.color)
+        
+        for piece in pieces:
+            # Check that the piece is not a king.
+            if not isinstance(piece, King):
+                if self.is_valid_move(king, board, (piece.col, piece.row), check_piece_position):
                     return True
 
         return False
@@ -549,10 +556,11 @@ class Game:
         # If king is in double check, only king move is checked.
         if (len(self.check_list) > 1
         and not self.king_can_move(chessboard, king)):
+            print("checkmate")
             return True
         elif (not self.king_can_move(chessboard, king)
         and not self.piece_can_block(chessboard.board, king)
-        and not self.can_capture_check_piece(chessboard, king)):
+        and not self.can_capture_check_piece(chessboard.board, king)):
             return True
         
         return False
