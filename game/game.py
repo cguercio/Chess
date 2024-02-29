@@ -344,18 +344,18 @@ class Game:
             # Calculates the int for the previous and next squares.
             previous_col = old_col + index - col_dir_factor
             next_col = old_col + index
-            new_square = (next_col, old_row)
+            castling_new_square = (next_col, old_row)
             previous_square = (previous_col, old_row)
             
             # Updates the board with the new moves.
-            chessboard.update_board(king, previous_square, new_square)
+            chessboard.update_board(king, previous_square, castling_new_square)
             
             # Checking to see if the new square is in check.
             self.in_check(chessboard.board)
                 
             # Checks if the king is in check.
             if king.in_check == True:
-                chessboard.reset_castling(king, old_square, new_square, index)
+                chessboard.reset_castling(king, old_square, castling_new_square, index)
                 return False 
         
         castled_queenside = left_castle == -1
@@ -370,7 +370,7 @@ class Game:
             return False
             
         # Update the board with rook move if castling is allowed.
-        new_rook_col = new_col + col_dir_factor * -1
+        new_rook_col = new_col + (col_dir_factor * -1)
         chessboard.update_board(rook, (rook_col, old_row), (new_rook_col, new_row))
         
         # Updates the move list with the rook move.
@@ -378,7 +378,7 @@ class Game:
         
         # Update the piece moves.
         king.move(new_square)
-        rook.move((new_col + col_dir_factor * -1, old_row))
+        rook.move((new_rook_col, old_row))
 
         # Draw the rook move on the screen. 
         screen.update_move(chessboard, rook, [], (new_rook_col, new_row), (rook_col, old_row))
