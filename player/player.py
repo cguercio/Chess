@@ -1,39 +1,38 @@
 from pieces import *
 from constants import *
-import pygame
+
 
 class Player:
+    pass
+    # def move(self, board_position, board):
+    #     """
+    #     Checks if the player clicked on a piece.
 
-    def move(self, pos, chessboard):
-        num_cols = len(chessboard.board[0]) # Gets the number of cols by getting the length of the first list
-        num_rows = len(chessboard.board) # Gets the number of rows by getting the number of lists
-        square_width = WIDTH // num_cols
-        square_height = HEIGHT // num_rows
-        
-        original_position = (0,0) # This is a place holder so this variable does not return none until move loop is in place.
-        
-        for row in chessboard.board:
-            for piece in row:
-                if (isinstance(piece, Piece) and (pos[0] > piece.x * square_width 
-                                                  and pos[0] < piece.x * square_width + square_width 
-                                                  and pos[1] > piece.y * square_height 
-                                                  and pos[1] < piece.y * square_height + square_height)):
-                    
-                    original_position = (piece.x, piece.y)
-                    return True, piece, original_position
+    #     Args:
+    #         click_position (tuple): Position on the board where the player clicked.
+    #         board (list): 2D list representing the board.
 
-        return False, piece, original_position
-    
-    def click_square(self, pos, board, location):
+    #     Returns:
+    #         bool, object, tuple: True if player clicked on piece, False if not. Piece clicked on and piece position.
+    #     """
+
+    #     # Unpacking location tuples.
+    #     col, row = board_position
         
-        num_cols = len(board.board[0]) # Gets the number of cols by getting the length of the first list
-        num_rows = len(board.board) # Gets the number of rows by getting the number of lists
-        square_width = WIDTH // num_cols
-        square_height = HEIGHT // num_rows
-        col, row = location
+    #     # Defining variables so they are not None.
+    #     original_position = (0,0)
+    #     piece = board[col][row]
         
-        if (pos[0] > col * square_width 
-            and pos[0] < col * square_width + square_width 
-            and pos[1] > row * square_height 
-            and pos[1] < row * square_height + square_height):
-            return True
+    #     # True if there board position contains a piece.
+    #     piece_on_square = board[col][row] != []
+        
+    #     # Checks if a piece is on square.
+    #     if piece_on_square:
+            
+    #         # Retrieves the clicked piece and its position.
+    #         piece = board[col][row]
+    #         original_position = (piece.col, piece.row)
+            
+    #         return True, piece, original_position
+
+    #     return False, piece, original_position

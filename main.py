@@ -3,18 +3,24 @@ from constants import *
 from board import *
 from pieces import *
 from player import *
-from utils import *
 from game import *
 import pygame
-import copy
+
+def mouse_click():
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    return True
+                if event.button == 3:
+                    return False
 
 def main():
     clock = pygame.time.Clock()
     
     # Initiating the board and drawing squares
     screen = Screen(WIDTH, HEIGHT)
-    chessboard = Board(8, 8)
-    starting_board = Board(8, 8)
+    chessboard = Board(8, 8, WIDTH, HEIGHT)
     square_list = chessboard.squares()
     screen.draw_squares(square_list, WHITE, GREEN)
 
@@ -63,7 +69,6 @@ def main():
     # Placing the pieces on the board.
     for item in Piece.instances:
         chessboard.place_piece(item)
-        starting_board.place_piece(item)
 
     # Draws the pieces at their starting squares.
     screen.draw_pieces(chessboard)
@@ -85,7 +90,7 @@ def main():
             # Displays the beginning of the move list.
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_DOWN and game.move_counter - index > 0:
-                    screen.display_start_board(chessboard, game.move_list)
+                    screen.display_start_board(chessboard, game)
                     index = game.move_counter
 
                 # Displays the previous move if the user presses left.
@@ -117,10 +122,13 @@ def main():
                 index = 0
             
                 mouse_pos = pygame.mouse.get_pos()
-                state, piece, original_position = player.move(mouse_pos, chessboard)
+                board_position = chessboard.get_board_position(mouse_pos)
+                piece = chessboard.get_square_contents(board_position)
                 
-                if (state == True and piece.color == WHITE and game.move_counter % 2 == 0
-                    or state == True and piece.color == BLACK and game.move_counter % 2 != 0):
+                piece_selected = True if piece != [] else False
+                
+                if (piece_selected == True and piece.color == WHITE and game.move_counter % 2 == 0
+                    or piece_selected == True and piece.color == BLACK and game.move_counter % 2 != 0):
                     mouse_down = True
                     
                 while mouse_down:
@@ -148,6 +156,7 @@ def main():
                             screen.draw_squares(square_list, WHITE, GREEN)
                             screen.draw_pieces(chessboard)
                             pygame.display.flip()
+                            
                             if mouse_click():
                                 mouse_pos2 = pygame.mouse.get_pos()
                                 move = True
@@ -165,66 +174,97 @@ def main():
                 
             # Checks if the user tried to move a piece.
             if move == True:
-                new_position = mouse_pos_to_board_pos(mouse_pos2, chessboard)
-                print(new_position)
+                original_position = (piece.col, piece.row)
+                new_position = chessboard.get_board_position(mouse_pos2)
                 old_piece = chessboard.board[new_position[0]][new_position[1]]
+                
                 if old_piece != [] and old_piece.color == piece.color:
                     old_piece = []
-                temp_board = copy.copy(chessboard)
-                result, next_board = valid_move(piece, temp_board, new_position, original_position, game, screen)
+                    
+                
+                if (piece.is_valid_move(new_position, original_position) == False
+                    or game.piece_in_path(chessboard.board, original_position, new_position) == True):
+                    valid_move = False
+                    
+                elif isinstance(piece, King) and piece.castling == True:
+                    
+                    new_king_position = piece.castle_right if new_position[0] - original_position[0] > 0 else piece.castle_left
+                        
+                    if game.can_castle(screen, piece, chessboard, original_position, new_king_position) == False:
+                        valid_move = False
+                    else:
+                        valid_move = True
+                        
+                elif game.can_capture(piece, chessboard.board, original_position, new_position) == False:
+                    valid_move = False
+                    
+                else:
+
+                    captured_piece = chessboard.update_board(piece, original_position, new_position)
+
+                    # Check if the piece's king is in check, disallowing movement and resetting the board.
+                    if game.results_in_check(piece, chessboard.board) == True:
+                        chessboard.reset_board(piece, original_position, new_position, captured_piece)
+                        valid_move = False
+                    else:
+                        piece.move(new_position)
+                        valid_move = True
+                    
                 
                 # Checks if a pawn reaches the edge of the board and it was a valid move.
-                if result == True and isinstance(piece, Pawn) and piece.y in [0,7]:
+                if valid_move == True and isinstance(piece, Pawn) and piece.row in [0,7]:
                     
                     # Updates the move list with the pawn move.
                     
                     screen.display_promotion(piece, chessboard)
+                    
                     if not mouse_click():
-                        result == False
+                        valid_move == False
                         move = False
                         piece.move(original_position)
-                        chessboard.reset_board(piece, new_position, original_position, old_piece)
+                        chessboard.reset_board(piece, original_position, new_position, old_piece)
                         screen.draw_squares(square_list, WHITE, GREEN)
                         screen.draw_pieces(chessboard)
                         pygame.display.flip()
                         
                     else:
                         game.move_list.append((game.move_counter, piece, new_position, original_position, old_piece))
-                        mouse_pos = pygame.mouse.get_pos()
-                        promoted_pawn = game.select_promotion(mouse_pos, chessboard, piece, player)
-
+                        clicked_position = chessboard.get_board_position(pygame.mouse.get_pos())
+                        promoted_pawn = piece.select_promotion(clicked_position)
+                        
                         # Updates the move list with the queen move. This way the move list has all information.
                         game.move_list.append((game.move_counter, promoted_pawn, new_position, original_position, old_piece))
                         
-                        # Updates the board and screen.
-                        temp_board.board[piece.x][piece.y] = promoted_pawn
-                        chessboard.board = next_board.board
                         screen.draw_squares(square_list, WHITE, GREEN)
                         screen.draw_pieces(chessboard)
                         pygame.display.flip()
                         
                         move = False
+                        valid_move == False
                         game.move_counter += 1
                         
                 
                 # Checks if the move was valid and updates the board, screen, and move list.
-                elif result == True:
+                elif valid_move == True:
                     
-                    # Updates the board and screen.
-                    chessboard.board = next_board.board
                     screen.draw_squares(square_list, WHITE, GREEN)
                     screen.draw_pieces(chessboard)
                     pygame.display.flip()
-                    game.move_list.append((game.move_counter, piece, (piece.x, piece.y), original_position, old_piece))
+                    game.move_list.append((game.move_counter, piece, (piece.col, piece.row), original_position, old_piece))
                     
                     move = False
+                    valid_move == False
                     game.move_counter += 1
                 
-                elif result == False:
+                elif valid_move == False:
                     move = False
+                    valid_move == False
                     screen.draw_squares(square_list, WHITE, GREEN)
                     screen.draw_pieces(chessboard)
                     pygame.display.flip()
+                
+                game.check_list = []
+                game.in_check(chessboard.board)
                 
                 if w_king.in_check and game.is_checkmate(chessboard, w_king):
                     print("Game Over! Black Wins!")
@@ -233,6 +273,6 @@ def main():
                     print("Game Over! White Wins!")
                         
                 game.check_list = []
-        
+                
 if __name__ == '__main__':
     main()

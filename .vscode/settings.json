@@ -3,7 +3,9 @@
         "blit",
         "keydown",
         "MOUSEBUTTONDOWN",
+        "MOUSEBUTTONUP",
         "pygame",
+        "queenside",
         "sourcery"
     ]
 }
