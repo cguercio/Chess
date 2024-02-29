@@ -90,19 +90,19 @@ class Board:
 
         return contents
         
-    def update_board(self, piece, new_position, original_position):
+    def update_board(self, piece, old_square, new_square):
         """
         Places the piece at it's new square and clears the old square.
 
         Args:
             piece (object): Piece being moved.
-            new_position (tuple): The new position of the piece
-            original_position (_type_): The original position of the piece.
+            old_square (_type_): The original position of the piece.
+            new_square (tuple): The new position of the piece
         """
         
         # Unpacking the location tuples.
-        old_col, old_row = original_position
-        new_col, new_row = new_position
+        old_col, old_row = old_square
+        new_col, new_row = new_square
 
         # Setting "captured_piece" to the new board position
         captured_piece = self.board[new_col][new_row]
@@ -113,38 +113,38 @@ class Board:
         
         return captured_piece
         
-    def reset_board(self, piece, new_position, original_position, old_piece=[]):
+    def reset_board(self, piece, old_square, new_square, old_piece=[]):
         """
         Places the piece at its original position, resets the new position square.
 
         Args:
             piece (object): Piece being moved.
-            new_position (tuple): New position of piece: (col, row)
-            original_position (tuple): Original position of piece: (col, row)
+            old_square (tuple): Original position of piece: (col, row)
+            new_square (tuple): New position of piece: (col, row)
             old_piece (object, optional): Piece being captured or empty list if no piece. Defaults to [].
         """
         
         # Unpacking the location tuples.
-        old_col, old_row = original_position
-        new_col, new_row = new_position
+        old_col, old_row = old_square
+        new_col, new_row = new_square
         
         # Put the old piece back to its original location put the old piece back.
         self.board[old_col][old_row] = piece
         self.board[new_col][new_row] = old_piece
         
-    def reset_castling(self, piece, new_position, original_position, i):
+    def reset_castling(self, piece, old_square, new_square, i):
         """
         Resets the king castling parameters and resets the board.
 
         Args:
             piece (object): Piece being moved.
-            new_position (tuple): The new position of the piece.
-            original_position (tuple): The original position of the piece.
+            old_square (tuple): The original position of the piece.
+            new_square (tuple): The new position of the piece.
             i (int): Index used during castling.
         """
         # Unpacking the location tuples.
-        old_col, old_row = original_position
-        new_col, new_row = new_position
+        old_col, old_row = old_square
+        new_col, new_row = new_square
         
         # Reset the castling attributes.
         piece.in_check = False

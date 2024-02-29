@@ -96,21 +96,20 @@ class Game:
             
         return False
     
-    def can_capture(self,piece, board, new_position, original_position):
+    def can_capture(self, piece, board, old_square, new_square):
         """
         Check for a valid capture.
 
         Args:
             board (list): 2D list representing the board.
-            new_position (tuple): Position to which the piece is being moved.
-            original_position (tuple): Original position of the piece.
+            old_square (tuple): Original position of the piece.
+            new_square (tuple): Position to which the piece is being moved.
 
         Returns:
             bool: False if the capture is not valid, True otherwise.
         """
-        # Unpacking position tuples.
-        old_col, old_row = original_position
-        new_col, new_row = new_position
+        # Unpacking position tuple.
+        new_col, new_row = new_square
         
         # Defining helper variables.
         piece_at_new_position = isinstance(board[new_col][new_row], Piece)
@@ -125,27 +124,27 @@ class Game:
         
         # Calls pawn capture logic if piece is a pawn.
         if isinstance(piece, Pawn):
-            return self.pawn_can_capture(board, new_position, original_position)
+            return self.pawn_can_capture(board, old_square, new_square)
         
         
         return True
         
-    def pawn_can_capture(self, board, new_position, original_position):
+    def pawn_can_capture(self, board, old_square, new_square):
         """
         Checks for valid pawn capture.
 
         Args:
             board (list): 2D list representing the board.
-            new_position (tuple): Position to which the piece is being moved.
-            original_position (tuple): Original position of the piece.
+            old_square (tuple): Original position of the piece.
+            new_square (tuple): Position to which the piece is being moved.
 
         Returns:
             bool: False if the capture is not valid, True otherwise.
         """
 
         # Unpacking position tuples.
-        old_col, old_row = original_position
-        new_col, new_row = new_position
+        old_col, old_row = old_square
+        new_col, new_row = new_square
         
         # Defining helper variables.
         piece_in_front_of_pawn = board[new_col][new_row] != []
@@ -164,24 +163,24 @@ class Game:
         
         return True
     
-    def is_valid_move(self, piece, board, from_square, to_square):
+    def is_valid_move(self, piece, board, old_square, new_square):
         """
         Checks if the move is valid.
 
         Args:
             piece (object): Piece being moved.
             board (list): 2D list representing the board.
-            from_square (tuple): Starting square of the piece.
-            to_square (tuple): Square to which the piece is being moved.
+            old_square (tuple): Starting square of the piece.
+            new_square (tuple): Square to which the piece is being moved.
 
         Returns:
             bool: True if move is valid, False otherwise.
         """
         
         # Defining helper variables.
-        piece_move_is_valid = piece.is_valid_move(to_square, from_square) == True
-        path_not_blocked = self.piece_in_path(board, to_square, from_square) == False
-        capture_is_valid = self.can_capture(piece, board, to_square, from_square) == True
+        piece_move_is_valid = piece.is_valid_move(new_square, old_square) == True
+        path_not_blocked = self.piece_in_path(board, old_square, new_square) == False
+        capture_is_valid = self.can_capture(piece, board, old_square, new_square) == True
         
         if (piece_move_is_valid 
             and path_not_blocked
@@ -261,8 +260,6 @@ class Game:
         white_king_object.in_check = False
         black_king_object.in_check = False
         
-        self.check_list = []
-        
         # Loop through the black piece list.
         for piece in black_pieces:
             
@@ -272,7 +269,8 @@ class Game:
             # Check if a piece can capture the king.
             if self.is_valid_move(piece, board, piece_position, white_king_pos):
                 self.check_list.append(piece)
-                white_king_object.in_check = True 
+                white_king_object.in_check = True
+                print("white in check")
         
         # Loop through the black piece list.        
         for piece in white_pieces:
@@ -284,10 +282,11 @@ class Game:
             if self.is_valid_move(piece, board, piece_position, black_king_pos):
                 self.check_list.append(piece)
                 black_king_object.in_check = True 
+                print("black in check")
 
         return white_king_object, black_king_object
 
-    def can_castle(self, screen, king, chessboard, new_position, original_position):
+    def can_castle(self, screen, king, chessboard, old_square, new_square):
         """
         Checks if the king is allowed to castle.
 
@@ -295,15 +294,15 @@ class Game:
             screen (object): Screen object.
             king (object): King object that is castling.
             chessboard (object): Board object.
-            new_position (tuple): Castling position of king.
-            original_position (tuple): Original position of the king.
+            old_square (tuple): Original position of the king.
+            new_square (tuple): Castling position of king.
 
         Returns:
             bool: False if king is not allowed to castle, True otherwise.
         """
         
-        old_col, old_row = original_position
-        new_col, new_row = new_position
+        old_col, old_row = old_square
+        new_col, new_row = new_square
         col_diff = new_col - old_col
         
         # Check if the king is currently in check.
@@ -313,7 +312,16 @@ class Game:
         if king.in_check == True:
             king.in_check = False
             king.castling = False
-            return False 
+            return False
+        
+        # Finds the appropriate rook object depending on which direction the user castled.
+        rook_col = 0 if col_diff < 0 else chessboard.cols - 1
+        rook = chessboard.board[rook_col][old_row]
+        
+        if self.piece_in_path(chessboard.board, (rook.col, rook.row), (king.col, king.row)):
+            king.in_check = False
+            king.castling = False
+            return False
         
         # Column direction factor determines the direction of the move.
         # This is used for the range start and step of the iteration.
@@ -340,40 +348,36 @@ class Game:
             previous_square = (previous_col, old_row)
             
             # Updates the board with the new moves.
-            chessboard.update_board(king, new_square, previous_square)
+            chessboard.update_board(king, previous_square, new_square)
             
             # Checking to see if the new square is in check.
             self.in_check(chessboard.board)
                 
             # Checks if the king is in check.
             if king.in_check == True:
-                chessboard.reset_castling(king, new_position, original_position, index)
+                chessboard.reset_castling(king, old_square, new_square, index)
                 return False 
         
         castled_queenside = left_castle == -1
         
         # If the king castles queenside update an extra square.
         if castled_queenside:
-            chessboard.update_board(king, (new_col, new_row), (next_col, old_row))
+            chessboard.update_board(king, (next_col, old_row), (new_col, new_row))
 
-        # Finds the appropriate rook object depending on which direction the user castled.
-        rook_col = 0 if col_diff < 0 else chessboard.cols - 1
-        rook = chessboard.board[rook_col][old_row]
-        
         # Checks for a previous rook move.
         if rook.has_moved == True:
-            chessboard.reset_castling(king, new_position, original_position, index)
+            chessboard.reset_castling(king, old_square, new_square, index)
             return False
-        
+            
         # Update the board with rook move if castling is allowed.
         new_rook_col = new_col + col_dir_factor * -1
-        chessboard.update_board(rook, (new_rook_col, new_row), (rook_col, old_row))
+        chessboard.update_board(rook, (rook_col, old_row), (new_rook_col, new_row))
         
         # Updates the move list with the rook move.
         self.move_list.append((self.move_counter, rook, (new_rook_col, new_row), (rook_col, old_row), []))
         
         # Update the piece moves.
-        king.move(new_position)
+        king.move(new_square)
         rook.move((new_col + col_dir_factor * -1, old_row))
 
         # Draw the rook move on the screen. 
@@ -458,23 +462,23 @@ class Game:
             
             # True if king can move and king can capture.
             move_is_valid = (king.is_valid_move(position, king_position) == True
-                        and self.can_capture(king, chessboard.board, position, king_position)) == True
+                        and self.can_capture(king, chessboard.board, king_position, position)) == True
             
             # Checks if the king move is valid.
             if move_is_valid:
                 
                 # Updates the board with the new king move.
-                captured_piece = chessboard.update_board(king, position, king_position)
+                captured_piece = chessboard.update_board(king, king_position, position)
                 
                 king_not_in_check = self.results_in_check(king, chessboard.board) == False
                 
                 # Checks if the new king move results in check.
                 if king_not_in_check:
-                    chessboard.reset_board(king, position, king_position, captured_piece)
+                    chessboard.reset_board(king, king_position, position, captured_piece)
                     return True
                 
                 # Resets the board after every iteration.
-                chessboard.reset_board(king, position, king_position, captured_piece)
+                chessboard.reset_board(king, king_position, position, captured_piece)
             
         return False
             
@@ -523,19 +527,22 @@ class Game:
             king (object): King in check.
 
         Returns:
-            bool: Returns True if piece can be captured.
+            bool: Returns True if piece can be captured, False otherwise.
         """
         # Getting the piece giving check.
-        check_piece = self.check_list[0]
-        check_piece_position = (check_piece.col, check_piece.row)
+        piece_giving_check = self.check_list[0]
+        piece_giving_check_position = (piece_giving_check.col, piece_giving_check.row)
         
-        # Getting the pieces that have the same color as the king in check.
+        # Getting all pieces that have the same color as the king in check.
         pieces = self.get_piece_by_color(board, king.color)
         
+        # Loop through the pieces and try to move them to the piece giving check.
         for piece in pieces:
             # Check that the piece is not a king.
             if not isinstance(piece, King):
-                if self.is_valid_move(king, board, (piece.col, piece.row), check_piece_position):
+                
+                # Checks if a piece can capture the piece giving check.
+                if self.is_valid_move(piece, board, (piece.col, piece.row), piece_giving_check_position):
                     return True
 
         return False
@@ -552,15 +559,23 @@ class Game:
             bool: Returns True if checkmate is on the board, False otherwise.
         """
         
-        # If check list has two pieces in it, king is in double check.
+        # Defining helper variables.
+        is_double_check = len(self.check_list) > 1
+        king_cant_move = self.king_can_move(chessboard, king) == False
+        piece_cant_block = self.piece_can_block(chessboard.board, king) == False
+        cant_capture_check_piece = self.can_capture_check_piece(chessboard.board, king) == False
+        
         # If king is in double check, only king move is checked.
-        if (len(self.check_list) > 1
-        and not self.king_can_move(chessboard, king)):
+        if is_double_check and king_cant_move:
             print("checkmate")
             return True
-        elif (not self.king_can_move(chessboard, king)
-        and not self.piece_can_block(chessboard.board, king)
-        and not self.can_capture_check_piece(chessboard.board, king)):
+        
+        # If king is not in double check, check if king can move,
+        # if piece can block, and piece giving check can be captured.
+        elif (king_cant_move
+                and piece_cant_block
+                and cant_capture_check_piece):
+            print("checkmate")
             return True
         
         return False

@@ -183,29 +183,28 @@ def main():
                     
                 
                 if (piece.is_valid_move(new_position, original_position) == False
-                    or game.piece_in_path(chessboard.board, new_position, new_position) == True):
+                    or game.piece_in_path(chessboard.board, original_position, new_position) == True):
                     valid_move = False
                     
                 elif isinstance(piece, King) and piece.castling == True:
                     
                     new_king_position = piece.castle_right if new_position[0] - original_position[0] > 0 else piece.castle_left
                         
-                    if game.can_castle(screen, piece, chessboard, new_king_position, original_position) == False:
+                    if game.can_castle(screen, piece, chessboard, original_position, new_king_position) == False:
                         valid_move = False
                     else:
                         valid_move = True
                         
-                elif game.can_capture(piece, chessboard.board, new_position, original_position) == False:
+                elif game.can_capture(piece, chessboard.board, original_position, new_position) == False:
                     valid_move = False
                     
                 else:
 
-                    captured_piece = chessboard.update_board(piece, new_position, original_position)
+                    captured_piece = chessboard.update_board(piece, original_position, new_position)
 
                     # Check if the piece's king is in check, disallowing movement and resetting the board.
                     if game.results_in_check(piece, chessboard.board) == True:
-                        print("false")
-                        chessboard.reset_board(piece, new_position, original_position, captured_piece)
+                        chessboard.reset_board(piece, original_position, new_position, captured_piece)
                         valid_move = False
                     else:
                         piece.move(new_position)
@@ -223,7 +222,7 @@ def main():
                         valid_move == False
                         move = False
                         piece.move(original_position)
-                        chessboard.reset_board(piece, new_position, original_position, old_piece)
+                        chessboard.reset_board(piece, original_position, new_position, old_piece)
                         screen.draw_squares(square_list, WHITE, GREEN)
                         screen.draw_pieces(chessboard)
                         pygame.display.flip()
@@ -263,7 +262,8 @@ def main():
                     screen.draw_squares(square_list, WHITE, GREEN)
                     screen.draw_pieces(chessboard)
                     pygame.display.flip()
-                    
+                
+                game.check_list = []
                 game.in_check(chessboard.board)
                 
                 if w_king.in_check and game.is_checkmate(chessboard, w_king):
@@ -272,6 +272,7 @@ def main():
                 elif b_king.in_check and game.is_checkmate(chessboard, b_king):
                     print("Game Over! White Wins!")
                         
-        
+                game.check_list = []
+                
 if __name__ == '__main__':
     main()
