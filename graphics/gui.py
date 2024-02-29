@@ -51,17 +51,15 @@ class Screen:
             location (tuple): Location to display the piece.
         """
         
-        num_cols = len(board.board[0])
-        num_rows = len(board.board)
         col, row = location
         
         img = pygame.image.load(piece.img)
         
         # Calculating the location the pieces should be displayed to be centered on the square.
-        img_offset_x = (WIDTH // num_cols - img.get_width()) // 2 + 2
-        img_offset_y = (HEIGHT // num_rows - img.get_height()) // 2 + 2
-        x_pos = col * WIDTH // num_cols + img_offset_x
-        y_pos = row * HEIGHT // num_rows + img_offset_y
+        img_offset_x = (WIDTH // board.cols - img.get_width()) // 2 + 2
+        img_offset_y = (HEIGHT // board.rows - img.get_height()) // 2 + 2
+        x_pos = col * WIDTH // board.cols + img_offset_x
+        y_pos = row * HEIGHT // board.rows + img_offset_y
         
         # Blit the image onto the screen.
         self.win.blit(img, (x_pos, y_pos))
@@ -90,14 +88,6 @@ class Screen:
             locations (list): List of tuples(board locations); (col, row)
         """
         
-        # Gets the size of the board in x and y.
-        num_cols = len(board.board[0])
-        num_rows = len(board.board)
-
-        # Calculating the height and width of the squares.
-        square_width = self.width // num_cols
-        square_height = self.height // num_rows
-        
         # Iterates over the locations list.
         for square in locations:
             
@@ -106,13 +96,13 @@ class Screen:
             
             # Defining helper variables.
             row_plus_col_is_even = (row + col) % 2 == 0
-            rect_x = col * square_width
-            rect_y = row * square_height
+            rect_x = col * board.square_width
+            rect_y = row * board.square_height
         
             # Color the piece original square with the correct color.
             fill_color = WHITE if row_plus_col_is_even else GREEN
             self.win.fill(fill_color, (rect_x, rect_y,
-                                            square_width, square_height))
+                                            board.square_width, board.square_height))
         
 
     def update_move(self, board, piece, old_piece, new_position, original_position, navigation=False):
@@ -146,25 +136,19 @@ class Screen:
         pygame.display.update()
         
     def display_start_board(self, board, game):
-        """
-        Loops backwards through the move list to display the starting board.
-
-        Args:
-            board (object): Board object.
-            move_list (list): List of tuples, (move_number, piece, new_position, original_position, old_piece)
-        """
         
         # Iterates backwards through the move list.
         for move in game.move_list[::-1]:
             
-            # Unpacking the move list tuple.
-            piece = move[1]
-            old_col, old_row = move[2]
-            new_col, new_row = move[3]
-            old_piece = move[4]
+            # Unpacking the move dictionary.
+            piece = move['current_piece']
+            old_square = move['new_square']# Since this function displays previous moves, the old and new squares
+            new_square = move["old_square"]# are flipped when unpacking the dictionary.
+            old_piece = move["old_piece"]
 
             # Updating the screen with the move.
-            self.update_move(board, piece, old_piece, (new_col, new_row), (old_col, old_row), True)
+            self.update_move(board, piece, old_piece, new_square, old_square, True)
+                
                 
     def display_previous_move(self, board, game, index):
         """
@@ -176,27 +160,29 @@ class Screen:
             index (int): Index used for slicing the move list.
         """
         
-        # Iterates over the move list to find the move to undo.
+        # Iterates over the list of move dictionaries to find the move to undo.
         for move in game.move_list[::-1]:
             
             # Move_to_display describes the current move number minus the number of times
             # the user pressed the right key (index).
             move_to_display = game.move_counter - index
             
-            # Is_desired_move checks if the current move number extracted from move_list
+            # Is_desired_move checks if the current move number extracted from move dictionary
             # matches the move the user wants to display.
-            is_desired_move_number = move[0] == move_to_display
+            is_desired_move_number = move['move_number'] == move_to_display
+            
             
             if is_desired_move_number:
                 
-                # Unpacking the move list tuple.
-                piece = move[1]
-                old_col, old_row = move[2]
-                new_col, new_row = move[3]
-                old_piece = move[4]
+                # Unpacking the move dictionary.
+                piece = move['current_piece']
+                old_square = move['new_square']# Since this function displays the previous move, the old and new squares
+                new_square = move['old_square']# are flipped when unpacking the dictionary.
+                old_piece = move["old_piece"]
                 
                 # Drawing the updated move on the screen.
-                self.update_move(board, piece, old_piece, (new_col, new_row), (old_col, old_row), True)
+                self.update_move(board, piece, old_piece, new_square, old_square, True)
+            
 
         
     def display_next_move(self, board, game, index):
@@ -218,18 +204,18 @@ class Screen:
             
             # Is_desired_move checks if the current move number extracted from move_list
             # matches the move the user wants to display.
-            is_desired_move_number = move[0] == move_to_display
+            is_desired_move_number = move['move_number'] == move_to_display
             
             if is_desired_move_number:
 
                 # Extracting the info needed from move list tuple.
-                piece = move[1]
-                new_col, new_row = move[2]
-                old_col, old_row = move[3]
+                piece = move['current_piece']
+                new_square = move['new_square']
+                old_square = move['old_square']
                 old_piece = []
                     
                 # Drawing the updated move on the screen.
-                self.update_move(board, piece, old_piece, (new_col, new_row), (old_col, old_row), True)
+                self.update_move(board, piece, old_piece, new_square, old_square, True)
                 
     def draw_on_mouse(self, board, piece, square_list):
         """

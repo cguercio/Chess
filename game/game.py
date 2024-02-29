@@ -12,6 +12,10 @@ class Game:
     check_list = []
     move_counter = 0
     
+    def update_move_list(self, move, current_piece, old_square, new_square, old_piece):
+        current_move = {'move_number': move, 'current_piece': current_piece, 'old_square': old_square, 'new_square': new_square, 'old_piece': old_piece}
+        self.move_list.append(current_move)
+    
     # Checks if the move is blocked by another piece.
     def find_path_points(self, position1, position2):
         """
@@ -374,7 +378,7 @@ class Game:
         chessboard.update_board(rook, (rook_col, old_row), (new_rook_col, new_row))
         
         # Updates the move list with the rook move.
-        self.move_list.append((self.move_counter, rook, (new_rook_col, new_row), (rook_col, old_row), []))
+        self.update_move_list(self.move_counter, rook, (rook_col, old_row), (new_rook_col, new_row), [])
         
         # Update the piece moves.
         king.move(new_square)
