@@ -128,12 +128,12 @@ class Game:
         
         # Calls pawn capture logic if piece is a pawn.
         if isinstance(piece, Pawn):
-            return self.pawn_can_capture(board, old_square, new_square)
+            return self.pawn_can_capture(piece, board, old_square, new_square)
         
         
         return True
         
-    def pawn_can_capture(self, board, old_square, new_square):
+    def pawn_can_capture(self, piece, board, old_square, new_square):
         """
         Checks for valid pawn capture.
 
@@ -156,6 +156,11 @@ class Game:
         square_is_empty = board[new_col][new_row] == []
         pawn_is_capturing = new_col != old_col
         
+        # Check if the pawn is trying to En Passant.
+        if pawn_is_capturing and self.can_enpassant(piece, new_square) == True:
+            piece.enpassant = True
+            return True
+        
         # Check if piece is in front of moving pawn, disallowing movement or capture.
         if piece_in_front_of_pawn and pawn_moving_forward:
             return False
@@ -167,6 +172,62 @@ class Game:
         
         return True
     
+    def can_enpassant(self, piece, new_square):
+        """
+        Check if the pawn can perform En Passant.
+
+        Args:
+            piece (object): Pawn being moved.
+
+        Returns:
+            bool: False if En Passant is not valid, True if it is valid.
+        """
+        
+        # Checks if the move is the first move on which En Passant can
+        # never be performed.
+        if len(self.move_list) == 0:
+            return False
+        
+        # Unpacking the move list dictionary.
+        last_move = self.move_list[-1]
+        last_move_piece = last_move['current_piece']
+        old_col, old_row = last_move['old_square']
+        new_col, new_row = last_move['new_square']
+        
+        # Defining helper variables.
+        white_enpassant_row = 3
+        black_enpassant_row = 4
+        last_move_is_not_pawn = not isinstance(last_move_piece, Pawn)
+        did_not_move_two_squares = abs(new_row - old_row) != 2
+        not_adjacent_to_current_pawn = new_col not in [piece.col - 1, piece.col + 1]
+        not_capturing_previous_pawn = new_square[0] != new_col
+        
+        # Check that the pawn is on the En Passant square.
+        if piece.color == WHITE and piece.row != white_enpassant_row:
+            return False   
+        elif piece.color == BLACK and piece.row != black_enpassant_row:
+            return False
+            
+        # Check is the last move was a pawn move.
+        if last_move_is_not_pawn:
+            return False
+        
+        # Check if last pawn move was 2 squares.
+        if did_not_move_two_squares:
+            return False
+        
+        # Check if last pawn was adjacent to the current pawn.
+        if not_adjacent_to_current_pawn:
+            return False
+        
+        # Check if the current pawn is only capturing on the same column as
+        # the previous pawn move.
+        if not_capturing_previous_pawn:
+            return False
+
+        return True
+            
+                
     def is_valid_move(self, piece, board, old_square, new_square):
         """
         Checks if the move is valid.
@@ -181,17 +242,23 @@ class Game:
             bool: True if move is valid, False otherwise.
         """
         
-        # Defining helper variables.
-        piece_move_is_valid = piece.is_valid_move(new_square, old_square) == True
-        path_not_blocked = self.piece_in_path(board, old_square, new_square) == False
-        capture_is_valid = self.can_capture(piece, board, old_square, new_square) == True
+        piece_move_not_valid = piece.is_valid_move(new_square, old_square) == False
         
-        if (piece_move_is_valid 
-            and path_not_blocked
-            and capture_is_valid):
-            return True
+        if piece_move_not_valid:
+            return False
         
-        return False
+        path_is_blocked = self.piece_in_path(board, old_square, new_square) == True
+        
+        if path_is_blocked:
+            return False
+        
+        capture_not_valid = self.can_capture(piece, board, old_square, new_square) == False
+        
+        if capture_not_valid:
+            return False
+        
+        return True
+        
 
     def find_kings(self, board):
         """
@@ -227,6 +294,7 @@ class Game:
         Returns:
             list: List of pieces on the board of specified color.
         """
+        
         # Forcing the color to be either white or black.
         assert color in [WHITE, BLACK]
         
@@ -571,7 +639,6 @@ class Game:
         
         # If king is in double check, only king move is checked.
         if is_double_check and king_cant_move:
-            print("checkmate")
             return True
         
         # If king is not in double check, check if king can move,
@@ -579,7 +646,6 @@ class Game:
         elif (king_cant_move
                 and piece_cant_block
                 and cant_capture_check_piece):
-            print("checkmate")
             return True
         
         return False
