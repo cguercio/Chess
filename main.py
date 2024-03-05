@@ -25,40 +25,40 @@ def main():
     screen.draw_squares(square_list, WHITE, GREEN)
 
     # Initiating black piece objects: qs = queens-side, ks = kings-side
-    qs_rook = Rook(0, 0, BLACK)
+    # qs_rook = Rook(0, 0, BLACK)
     # qs_knight = Knight(1, 0, BLACK)
     # qs_bishop = Bishop(2, 0, BLACK)
     # b_queen = Queen(3, 0, BLACK)
     b_king = King(4, 0, BLACK)
     # ks_bishop = Bishop(5, 0, BLACK)
     # ks_knight = Knight(6, 0, BLACK)
-    ks_rook = Rook(7, 0, BLACK)
-    # bpawn1 = Pawn(0, 1, BLACK)
-    # bpawn2 = Pawn(1, 1, BLACK)
-    # bpawn3 = Pawn(2, 1, BLACK)
-    # bpawn4 = Pawn(3, 1, BLACK)
-    # bpawn5 = Pawn(4, 1, BLACK)
-    # bpawn6 = Pawn(5, 1, BLACK)
-    # bpawn7 = Pawn(6, 1, BLACK)
-    bpawn8 = Pawn(7, 1, BLACK)
+    # ks_rook = Rook(7, 0, BLACK)
+    bpawn1 = Pawn(0, 1, BLACK)
+    bpawn2 = Pawn(1, 1, BLACK)
+    bpawn3 = Pawn(2, 1, BLACK)
+    bpawn4 = Pawn(3, 1, BLACK)
+    bpawn5 = Pawn(4, 1, BLACK)
+    bpawn6 = Pawn(5, 1, BLACK)
+    bpawn7 = Pawn(6, 1, BLACK)
+    # bpawn8 = Pawn(7, 1, BLACK)
 
     # Initiating white piece objects: qs = queens-side, ks = kings-side
-    qs_rook = Rook(0, 7, WHITE)
+    # qs_rook = Rook(0, 7, WHITE)
     # qs_knight = Knight(1, 7, WHITE)
     # qs_bishop = Bishop(2, 7, WHITE)
-    # w_queen = Queen(3, 7, WHITE)
+    w_queen = Queen(3, 7, WHITE)
     w_king = King(4, 7, WHITE)
     # ks_bishop = Bishop(5, 7, WHITE)
     # ks_knight = Knight(6, 7, WHITE)
-    ks_rook = Rook(7, 7, WHITE)
-    wpawn1 = Pawn(0, 6, WHITE)
-    # wpawn2 = Pawn(1, 6, WHITE)
-    # wpawn3 = Pawn(2, 6, WHITE)
-    # wpawn4 = Pawn(3, 6, WHITE)
-    # wpawn5 = Pawn(4, 6, WHITE)
-    # wpawn6 = Pawn(5, 6, WHITE)
-    # wpawn7 = Pawn(6, 6, WHITE)
-    # wpawn8 = Pawn(7, 6, WHITE)
+    # ks_rook = Rook(7, 7, WHITE)
+    # wpawn1 = Pawn(0, 6, WHITE)
+    wpawn2 = Pawn(1, 6, WHITE)
+    wpawn3 = Pawn(2, 6, WHITE)
+    wpawn4 = Pawn(3, 6, WHITE)
+    wpawn5 = Pawn(4, 6, WHITE)
+    wpawn6 = Pawn(5, 6, WHITE)
+    wpawn7 = Pawn(6, 6, WHITE)
+    wpawn8 = Pawn(7, 6, WHITE)
 
     # Initiating player objects
     player = Player()
@@ -205,6 +205,8 @@ def main():
                     # Check if the piece's king is in check, disallowing movement and resetting the board.
                     if game.results_in_check(piece, chessboard.board) == True:
                         chessboard.reset_board(piece, original_position, new_position, captured_piece)
+                        if isinstance(piece, Pawn):
+                            piece.enpassant = False
                         valid_move = False
                     else:
                         piece.move(new_position)
@@ -246,7 +248,27 @@ def main():
                         valid_move == False
                         game.move_counter += 1
                         
-                
+                elif valid_move == True and isinstance(piece, Pawn) and piece.enpassant == True:
+                    
+                    chessboard.update_board(piece, original_position, new_position)
+                    game.update_move_list(game.move_counter, piece, original_position, new_position, old_piece)
+                    
+                    if piece.color == WHITE:
+                        captured_piece = chessboard.update_board([], original_position, (piece.col, piece.row + 1))
+                    else:
+                        captured_piece = chessboard.update_board([], original_position, (piece.col, piece.row - 1))
+                        
+                    game.update_move_list(game.move_counter, [], (captured_piece.col, captured_piece.row), (captured_piece.col, captured_piece.row), captured_piece)
+                        
+                    screen.draw_squares(square_list, WHITE, GREEN)
+                    screen.draw_pieces(chessboard)
+                    pygame.display.flip()
+                    
+                    piece.enpassant = False
+                    move = False
+                    valid_move == False
+                    game.move_counter += 1
+                    
                 # Checks if the move was valid and updates the board, screen, and move list.
                 elif valid_move == True:
                     

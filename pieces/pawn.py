@@ -10,6 +10,7 @@ class Pawn(Piece):
         self.color = color
         self.starting_pos = (col, row)
         self.promotion = False
+        self.enpassant = False
         
         # If color attribute is black, set img attribute to white piece png, white otherwise.
         if self.color == BLACK:
@@ -67,4 +68,5 @@ class Pawn(Piece):
             # Check if the pawn is moving more than 1 diagonally.
             if moved_more_than_one_diagonal or moved_not_on_diagonal:
                 return False
+            
         return True

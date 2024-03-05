@@ -121,10 +121,13 @@ class Screen:
         
         # Clear the starting and finishing squares of the move.
         self.clear_squares(board, [original_position, new_position])
-
-        # Displays the image of the piece at the new position.
-        self.display_image(board, piece, new_position)
         
+        new_piece_is_not_empty = piece != []
+
+        if new_piece_is_not_empty and navigation == True:
+            self.display_image(board, piece, new_position)
+        # Displays the image of the piece at the new position.
+                
         # Defining helper variable.
         old_piece_is_not_empty = old_piece != []
         
