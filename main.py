@@ -2,7 +2,6 @@ from graphics import *
 from constants import *
 from board import *
 from pieces import *
-from player import *
 from game import *
 import pygame
 
@@ -20,12 +19,29 @@ def mouse_click():
 def main():
     clock = pygame.time.Clock()
     
-    # Initiating the board and drawing squares
+    # Instantiating objects.
     screen = Screen(WIDTH, HEIGHT)
     chessboard = Board(8, 8, WIDTH, HEIGHT, board_location)
-    square_list = chessboard.squares()
-    screen.draw_squares(square_list, WHITE, GREEN)
-
+    game = Game()
+    
+    # Initiating white piece objects: qs = queens-side, ks = kings-side
+    qs_rook = Rook(0, 7, WHITE)
+    qs_knight = Knight(1, 7, WHITE)
+    qs_bishop = Bishop(2, 7, WHITE)
+    w_queen = Queen(3, 7, WHITE)
+    w_king = King(4, 7, WHITE)
+    ks_bishop = Bishop(5, 7, WHITE)
+    ks_knight = Knight(6, 7, WHITE)
+    ks_rook = Rook(7, 7, WHITE)
+    wpawn1 = Pawn(0, 6, WHITE)
+    wpawn2 = Pawn(1, 6, WHITE)
+    wpawn3 = Pawn(2, 6, WHITE)
+    wpawn4 = Pawn(3, 6, WHITE)
+    wpawn5 = Pawn(4, 6, WHITE)
+    wpawn6 = Pawn(5, 6, WHITE)
+    wpawn7 = Pawn(6, 6, WHITE)
+    wpawn8 = Pawn(7, 6, WHITE)
+    
     # Initiating black piece objects: qs = queens-side, ks = kings-side
     qs_rook = Rook(0, 0, BLACK)
     qs_knight = Knight(1, 0, BLACK)
@@ -44,51 +60,34 @@ def main():
     bpawn7 = Pawn(6, 1, BLACK)
     bpawn8 = Pawn(7, 1, BLACK)
 
-    # Initiating white piece objects: qs = queens-side, ks = kings-side
-    qs_rook = Rook(0, 7, WHITE)
-    qs_knight = Knight(1, 7, WHITE)
-    qs_bishop = Bishop(2, 7, WHITE)
-    w_queen = Queen(3, 7, WHITE)
-    w_king = King(4, 7, WHITE)
-    ks_bishop = Bishop(5, 7, WHITE)
-    ks_knight = Knight(6, 7, WHITE)
-    ks_rook = Rook(7, 7, WHITE)
-    wpawn1 = Pawn(0, 6, WHITE)
-    wpawn2 = Pawn(1, 6, WHITE)
-    wpawn3 = Pawn(2, 6, WHITE)
-    wpawn4 = Pawn(3, 6, WHITE)
-    wpawn5 = Pawn(4, 6, WHITE)
-    wpawn6 = Pawn(5, 6, WHITE)
-    wpawn7 = Pawn(6, 6, WHITE)
-    wpawn8 = Pawn(7, 6, WHITE)
-
-    # Initiating player objects
-    player = Player()
-
-    # Initiating the game object.
-    game = Game()
-
-    # Placing the pieces on the board.
+    # Updating the initial board with the pieces.
     for item in Piece.instances:
         chessboard.place_piece(item)
 
-    # Draws the pieces at their starting squares.
+    # Draws squares and pieces on the screen.
+    square_list = chessboard.squares()
+    screen.draw_squares(square_list, WHITE, GREEN)
     screen.draw_pieces(chessboard)
     pygame.display.update()
     
-    index = 0
 
+    index = 0
     running = True
     while running:
 
+        # Locks while loop tick.
         clock.tick(FPS)
 
-        # Quit pygame if escape is clicked.
+        # Detects pygame events.
         for event in pygame.event.get():
+            
             if event.type == pygame.QUIT:
                 running = False
                 break
 
+            ### This section is for navigating the board using the arrow keys.
+            ### This does not change the board. This only updates the screen visually.
+            
             # Displays the beginning of the move list.
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_DOWN and game.move_counter - index > 0:
@@ -114,15 +113,19 @@ def main():
                     screen.draw_pieces(chessboard)
                     pygame.display.update()
                     index = 0
-
+            
+            ### This section contains the logic for detecting if the user has made a move.
             move = False
             mouse_down = False
             if event.type == pygame.MOUSEBUTTONDOWN:
+                
+                # Draws the current board on the screen in case the user was looking at previous moves.
+                index = 0
                 screen.draw_squares(square_list, WHITE, GREEN)
                 screen.draw_pieces(chessboard)
                 pygame.display.update()
-                index = 0
-            
+                
+                ### Start next refactor here.
                 mouse_pos = pygame.mouse.get_pos()
                 
                 board_position = chessboard.get_board_position(mouse_pos)
@@ -179,7 +182,7 @@ def main():
                                 break
 
 
-                
+            ### This section contains the logic to determine of the move the user tried to play is valid.
             # Checks if the user tried to move a piece.
             if move == True:
                 
@@ -224,6 +227,8 @@ def main():
                 else:
                     valid_move = False
                 
+                ### This section contains the logic of updating the board and screen with a valid move.
+                ### This section also checks for promoting pawns and En Passant moves.
                 # Checks if a pawn reaches the edge of the board and it was a valid move.
                 if valid_move == True and isinstance(piece, Pawn) and piece.row in [0,7]:
                     
@@ -300,6 +305,7 @@ def main():
                     screen.draw_pieces(chessboard)
                     pygame.display.flip()
                 
+                ### This section checks the board for checkmate on either side.
                 game.check_list = []
                 game.in_check(chessboard.board)
                 

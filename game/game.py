@@ -1,6 +1,5 @@
 from pieces import *
 from constants import *
-from player import *
 from graphics import *
 from utils import *
 
