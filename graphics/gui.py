@@ -1,7 +1,6 @@
 import pygame
 from constants import *
 from pieces import *
-import os
 pygame.init()
 pygame.font.init()
 
@@ -50,16 +49,19 @@ class Screen:
             piece (object): Piece being displayed.
             location (tuple): Location to display the piece.
         """
-        
+        # Unpacking piece location tuple.
         col, row = location
+        
+        # Uses the location of the board to display the pieces on the correct square.
+        x_offset, y_offset = board.location
         
         img = pygame.image.load(piece.img)
         
         # Calculating the location the pieces should be displayed to be centered on the square.
-        img_offset_x = (WIDTH // board.cols - img.get_width()) // 2 + 2
-        img_offset_y = (HEIGHT // board.rows - img.get_height()) // 2 + 2
-        x_pos = col * WIDTH // board.cols + img_offset_x
-        y_pos = row * HEIGHT // board.rows + img_offset_y
+        img_offset_x = (board.square_width - img.get_width()) // 2 + 2
+        img_offset_y = (board.square_height - img.get_height()) // 2 + 2
+        x_pos = col * board.square_width + img_offset_x + x_offset
+        y_pos = row * board.square_height + img_offset_y + y_offset
         
         # Blit the image onto the screen.
         self.win.blit(img, (x_pos, y_pos))
@@ -88,6 +90,8 @@ class Screen:
             locations (list): List of tuples(board locations); (col, row)
         """
         
+        x_offset, y_offset = board.location
+        
         # Iterates over the locations list.
         for square in locations:
             
@@ -96,8 +100,8 @@ class Screen:
             
             # Defining helper variables.
             row_plus_col_is_even = (row + col) % 2 == 0
-            rect_x = col * board.square_width
-            rect_y = row * board.square_height
+            rect_x = col * board.square_width + x_offset
+            rect_y = row * board.square_height + y_offset
         
             # Color the piece original square with the correct color.
             fill_color = WHITE if row_plus_col_is_even else GREEN
@@ -233,6 +237,13 @@ class Screen:
         # Getting the mouse location on the screen.
         location = pygame.mouse.get_pos()
         col, row = location
+        
+        # Getting the board position from the mouse position.
+        board_col, board_row = board.get_board_position(location)
+        
+        # Check if the mouse is off the board.
+        if board_col == None or board_row == None:
+            return
         
         # Load piece's image and center it on the mouse.
         img = pygame.image.load(piece.img)
