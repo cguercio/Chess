@@ -6,11 +6,12 @@ import math
 class Board:
     board_list = []
 
-    def __init__(self, cols, rows, width, height):
+    def __init__(self, cols, rows, width, height, location):
         self.cols = cols
         self.rows = rows
         self.width = width
         self.height = height
+        self.location = location
         self.board = [[[] for _ in range(cols)] for _ in range(rows)]
         self.square_width = self.width // self.cols
         self.square_height = self.height // self.rows
@@ -26,10 +27,12 @@ class Board:
             A list of lists, where each inner list contains the (x, y) coordinates of a square.
 
         """
+        # Unpacking board location tuple.
+        board_x, board_y = self.location
         
-        # Building lists of columns and rows depending on the screen and square width and height.
-        col_start_points = range(0, self.width, self.square_width)
-        row_start_points = range(0, self.height, self.square_height)
+        # Building lists of columns and rows depending on the screen, board position, and square width and height.
+        col_start_points = range(board_x, board_x + self.width, self.square_width)
+        row_start_points = range(board_y, board_y + self.height, self.square_height)
         
         # Returns a list of lists representing the board.
         return [
@@ -66,9 +69,18 @@ class Board:
         Returns:
             tuple: Returns the new board position.
         """
+        # Unpacking location tuples
+        mouse_x, mouse_y = mouse_position
+        board_x, board_y = self.location
         
-        board_col = int(math.floor(mouse_position[0] // self.square_width))
-        board_row = int(math.floor(mouse_position[1] // self.square_height))
+        # Subtracts the board position from the mouse position, divides by the square height/width
+        # and rounds down to the nearest 100 to get the board position regardless of the board position on the screen.
+        board_col = int(math.floor((mouse_x - board_x) // self.square_width))
+        board_row = int(math.floor((mouse_y - board_y) // self.square_height))
+        
+        if board_col > self.cols - 1 or board_col < 0 or board_row > self.rows - 1 or board_row < 0:
+            board_col = None
+            board_row = None
 
         return board_col, board_row
     

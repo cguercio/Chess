@@ -27,6 +27,10 @@ class Bishop(Piece):
             boolean: True if move is valid, False otherwise.
         """
         
+        # Defining the extents of the board.
+        upper_board_extents = 7
+        lower_board_extents = 0
+        
         # Unpacking location tuples.
         old_col, old_row = original_position
         new_col, new_row = new_position

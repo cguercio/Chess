@@ -6,6 +6,8 @@ from player import *
 from game import *
 import pygame
 
+board_location = (0, 0)
+
 def mouse_click():
     while True:
         for event in pygame.event.get():
@@ -20,19 +22,19 @@ def main():
     
     # Initiating the board and drawing squares
     screen = Screen(WIDTH, HEIGHT)
-    chessboard = Board(8, 8, WIDTH, HEIGHT)
+    chessboard = Board(8, 8, WIDTH, HEIGHT, board_location)
     square_list = chessboard.squares()
     screen.draw_squares(square_list, WHITE, GREEN)
 
     # Initiating black piece objects: qs = queens-side, ks = kings-side
-    # qs_rook = Rook(0, 0, BLACK)
-    # qs_knight = Knight(1, 0, BLACK)
-    # qs_bishop = Bishop(2, 0, BLACK)
-    # b_queen = Queen(3, 0, BLACK)
+    qs_rook = Rook(0, 0, BLACK)
+    qs_knight = Knight(1, 0, BLACK)
+    qs_bishop = Bishop(2, 0, BLACK)
+    b_queen = Queen(3, 0, BLACK)
     b_king = King(4, 0, BLACK)
-    # ks_bishop = Bishop(5, 0, BLACK)
-    # ks_knight = Knight(6, 0, BLACK)
-    # ks_rook = Rook(7, 0, BLACK)
+    ks_bishop = Bishop(5, 0, BLACK)
+    ks_knight = Knight(6, 0, BLACK)
+    ks_rook = Rook(7, 0, BLACK)
     bpawn1 = Pawn(0, 1, BLACK)
     bpawn2 = Pawn(1, 1, BLACK)
     bpawn3 = Pawn(2, 1, BLACK)
@@ -40,18 +42,18 @@ def main():
     bpawn5 = Pawn(4, 1, BLACK)
     bpawn6 = Pawn(5, 1, BLACK)
     bpawn7 = Pawn(6, 1, BLACK)
-    # bpawn8 = Pawn(7, 1, BLACK)
+    bpawn8 = Pawn(7, 1, BLACK)
 
     # Initiating white piece objects: qs = queens-side, ks = kings-side
-    # qs_rook = Rook(0, 7, WHITE)
-    # qs_knight = Knight(1, 7, WHITE)
-    # qs_bishop = Bishop(2, 7, WHITE)
+    qs_rook = Rook(0, 7, WHITE)
+    qs_knight = Knight(1, 7, WHITE)
+    qs_bishop = Bishop(2, 7, WHITE)
     w_queen = Queen(3, 7, WHITE)
     w_king = King(4, 7, WHITE)
-    # ks_bishop = Bishop(5, 7, WHITE)
-    # ks_knight = Knight(6, 7, WHITE)
-    # ks_rook = Rook(7, 7, WHITE)
-    # wpawn1 = Pawn(0, 6, WHITE)
+    ks_bishop = Bishop(5, 7, WHITE)
+    ks_knight = Knight(6, 7, WHITE)
+    ks_rook = Rook(7, 7, WHITE)
+    wpawn1 = Pawn(0, 6, WHITE)
     wpawn2 = Pawn(1, 6, WHITE)
     wpawn3 = Pawn(2, 6, WHITE)
     wpawn4 = Pawn(3, 6, WHITE)
@@ -122,10 +124,16 @@ def main():
                 index = 0
             
                 mouse_pos = pygame.mouse.get_pos()
-                board_position = chessboard.get_board_position(mouse_pos)
-                piece = chessboard.get_square_contents(board_position)
                 
-                piece_selected = True if piece != [] else False
+                board_position = chessboard.get_board_position(mouse_pos)
+                
+                if board_position[0] != None:
+
+                    piece = chessboard.get_square_contents(board_position)
+                    piece_selected = True if piece != [] else False
+                    
+                else:
+                    piece_selected = False
                 
                 if (piece_selected == True and piece.color == WHITE and game.move_counter % 2 == 0
                     or piece_selected == True and piece.color == BLACK and game.move_counter % 2 != 0):
@@ -174,44 +182,47 @@ def main():
                 
             # Checks if the user tried to move a piece.
             if move == True:
+                
                 original_position = (piece.col, piece.row)
                 new_position = chessboard.get_board_position(mouse_pos2)
-                old_piece = chessboard.board[new_position[0]][new_position[1]]
                 
-                if old_piece != [] and old_piece.color == piece.color:
-                    old_piece = []
-                    
+                if new_position[0] != None:
+                    old_piece = chessboard.get_square_contents(new_position)
                 
-                if (piece.is_valid_move(new_position, original_position) == False
-                    or game.piece_in_path(chessboard.board, original_position, new_position) == True):
-                    valid_move = False
-                    
-                elif isinstance(piece, King) and piece.castling == True:
-                    
-                    new_king_position = piece.castle_right if new_position[0] - original_position[0] > 0 else piece.castle_left
-                        
-                    if game.can_castle(screen, piece, chessboard, original_position, new_king_position) == False:
+                    if old_piece != [] and old_piece.color == piece.color:
+                        old_piece = []
+                
+                    if (piece.is_valid_move(new_position, original_position) == False
+                        or game.piece_in_path(chessboard.board, original_position, new_position) == True):
                         valid_move = False
-                    else:
-                        valid_move = True
                         
-                elif game.can_capture(piece, chessboard.board, original_position, new_position) == False:
-                    valid_move = False
-                    
+                    elif isinstance(piece, King) and piece.castling == True:
+                        
+                        new_king_position = piece.castle_right if new_position[0] - original_position[0] > 0 else piece.castle_left
+                            
+                        if game.can_castle(screen, piece, chessboard, original_position, new_king_position) == False:
+                            valid_move = False
+                        else:
+                            valid_move = True
+                            
+                    elif game.can_capture(piece, chessboard.board, original_position, new_position) == False:
+                        valid_move = False
+                        
+                    else:
+
+                        captured_piece = chessboard.update_board(piece, original_position, new_position)
+
+                        # Check if the piece's king is in check, disallowing movement and resetting the board.
+                        if game.results_in_check(piece, chessboard.board) == True:
+                            chessboard.reset_board(piece, original_position, new_position, captured_piece)
+                            if isinstance(piece, Pawn):
+                                piece.enpassant = False
+                            valid_move = False
+                        else:
+                            piece.move(new_position)
+                            valid_move = True
                 else:
-
-                    captured_piece = chessboard.update_board(piece, original_position, new_position)
-
-                    # Check if the piece's king is in check, disallowing movement and resetting the board.
-                    if game.results_in_check(piece, chessboard.board) == True:
-                        chessboard.reset_board(piece, original_position, new_position, captured_piece)
-                        if isinstance(piece, Pawn):
-                            piece.enpassant = False
-                        valid_move = False
-                    else:
-                        piece.move(new_position)
-                        valid_move = True
-                    
+                    valid_move = False
                 
                 # Checks if a pawn reaches the edge of the board and it was a valid move.
                 if valid_move == True and isinstance(piece, Pawn) and piece.row in [0,7]:
