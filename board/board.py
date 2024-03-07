@@ -1,6 +1,3 @@
-from constants import *
-from utils import *
-from pieces import *
 import math
 
 class Board:

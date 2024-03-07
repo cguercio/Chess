@@ -12,6 +12,28 @@ This project serves as both a learning experience for me and a showcase piece fo
 - Graphical user interface using Pygame
 - Support for all standard chess rules, including en passant, castling, and promotion
 
+## Cloning the Repository and Installing Dependencies
+
+To get started with Pygame Chess, follow these steps:
+
+### 1. Clone the Repository
+
+Clone the Pygame Chess repository to your local machine using the following command:
+
+```bash
+git clone https://github.com/cguercio/Chess
+
+### 2. Navigate to the Project Directory
+
+cd pygame-chess
+
+### 3. Install Dependencies
+
+pip install -r requirements.txt
+
+### 4. Start Using Pygame Chess
+
+python main.py
 
 ## Acknowledgments
 -Thanks to the Pygame development team for creating such a powerful library.

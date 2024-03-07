@@ -2,7 +2,6 @@ import pygame
 from constants import *
 from pieces import *
 pygame.init()
-pygame.font.init()
 
 class Screen:
 

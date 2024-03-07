@@ -1,6 +1,5 @@
 from pieces import Piece
 from constants import *
-import math
 import os
 
 class Knight(Piece):

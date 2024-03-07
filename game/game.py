@@ -1,10 +1,5 @@
 from pieces import *
 from constants import *
-from graphics import *
-from utils import *
-
-
-
 
 class Game:
     move_list = []
