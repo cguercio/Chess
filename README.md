@@ -22,18 +22,18 @@ Clone the Pygame Chess repository to your local machine using the following comm
 
 ```bash
 git clone https://github.com/cguercio/Chess
-
+```
 ### 2. Navigate to the Project Directory
-
-cd pygame-chess
-
+```
+cd chess
+```
 ### 3. Install Dependencies
-
+```
 pip install -r requirements.txt
-
+```
 ### 4. Start Using Pygame Chess
-
+```
 python main.py
-
+```
 ## Acknowledgments
 -Thanks to the Pygame development team for creating such a powerful library.
